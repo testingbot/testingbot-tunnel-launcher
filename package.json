@@ -1,0 +1,20 @@
+{
+  "author": "TestingBot <info@testingbot.com> (testingbot.com)",
+  "name": "testingbot-tunnel-launcher",
+  "description": "A wrapper around TestingBot's Tunnel",
+  "version": "1.0.0",
+  "homepage": "https://github.com/testingbot/testingbot-tunnel-launcher",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/testingbot/testingbot-tunnel-launcher.git"
+  },
+  "devDependencies": {
+    "mocha": ""
+  },
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "async": ""
+  }
+}
