@@ -49,7 +49,7 @@ var testingbotTunnel = require('testingbot-tunnel-launcher'),
     // More verbose output from the tunnel
     verbose: true,
 
-    // Port on whichthe tunnel Selenium relay will listen for
+    // Port on which the tunnel Selenium relay will listen for
     // requests. Default 4445. (optional)
     se-port: null,
 
