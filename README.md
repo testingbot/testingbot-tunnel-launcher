@@ -62,7 +62,10 @@ var testingbotTunnel = require('testingbot-tunnel-launcher'),
     fast-fail-regexps: null,
 
     // Write logging output to this logfile (optional)
-    logfile: null
+    logfile: null,
+
+    // Change the tunnel version - see versions on https://testingbot.com/support/other/tunnel
+    tunnelVersion: "1.18"
   };
 
 testingbotTunnel(options, function(err, tunnel) {
