@@ -65,7 +65,7 @@ var testingbotTunnel = require('testingbot-tunnel-launcher'),
     logfile: null,
 
     // Change the tunnel version - see versions on https://testingbot.com/support/other/tunnel
-    tunnelVersion: "1.18"
+    tunnelVersion: "1.19" // or 2.1 (Java 8)
   };
 
 testingbotTunnel(options, function(err, tunnel) {
@@ -91,6 +91,16 @@ npm test
 ```
 
 ## Changelog
+
+### v1.0.6
+- Small fixes
+- Display new version/invalid credentials
+
+### v1.0.5
+- Add `tunnelVersion` support to specify which version of the tunnel you want to use
+
+### v1.0.1 - v1.0.4
+- Minor fixes
 
 ### v1.0.0
 - First release of testingbot-tunnel-launcher
