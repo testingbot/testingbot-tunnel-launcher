@@ -2,7 +2,7 @@
   "author": "TestingBot <info@testingbot.com> (testingbot.com)",
   "name": "testingbot-tunnel-launcher",
   "description": "A wrapper around TestingBot's Tunnel",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "homepage": "https://github.com/testingbot/testingbot-tunnel-launcher",
   "repository": {
     "type": "git",
