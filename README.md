@@ -92,6 +92,9 @@ npm test
 
 ## Changelog
 
+### v1.0.7
+- Properly handle SIGINT, exit and uncaughtException
+
 ### v1.0.6
 - Small fixes
 - Display new version/invalid credentials
