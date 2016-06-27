@@ -1,4 +1,8 @@
 # testingbot-tunnel-launcher
+[![npm](https://img.shields.io/npm/v/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://www.npmjs.com/package/testingbot-tunnel-launcher)
+[![Dependency Status](https://img.shields.io/david/testingbot/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://david-dm.org/testingbot/testingbot-tunnel-launcher)
+[![devDependency Status](https://img.shields.io/david/dev/testingbot/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://david-dm.org/testingbot/testingbot-tunnel-launcher#info=devDependencies)
+[![license](https://img.shields.io/github/license/testingbot/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://github.com/testingbot/testingbot-tunnel-launcher/blob/master/LICENSE)
 
 A library to download and launch TestingBot Tunnel.
 
@@ -110,27 +114,6 @@ npm test
 
 
 
-## License
-
-(The MIT License)
+## MIT license
 
 Copyright (c) TestingBot &lt;info@testingbot.com&gt;
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-'Software'), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
