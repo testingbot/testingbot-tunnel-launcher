@@ -19,7 +19,7 @@
     "mocha": "^2.5.3"
   },
   "engines": {
-    "node": "*"
+    "node": ">=4.4"
   },
   "license": "MIT",
   "bugs": {
@@ -28,5 +28,14 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/testingbot/testingbot-tunnel-launcher.git"
-  }
+  },
+  "keywords": [
+    "webdriverio",
+    "wdio",
+    "selenium",
+    "testingbot",
+    "test",
+    "automation",
+    "cloud"
+  ]
 }
