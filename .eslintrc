@@ -1,7 +1,11 @@
 {
   "extends": "standard",
   "rules": {
-    "indent": [2, 4]
+    "indent": [2, 4],
+    "no-var": 2,
+    "prefer-arrow-callback": 2,
+    "prefer-const": 2,
+    "prefer-template": 2
   },
   "parser": "babel-eslint",
   "globals": {}
