@@ -3,7 +3,7 @@
 [![Dependency Status](https://img.shields.io/david/testingbot/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://david-dm.org/testingbot/testingbot-tunnel-launcher)
 [![devDependency Status](https://img.shields.io/david/dev/testingbot/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://david-dm.org/testingbot/testingbot-tunnel-launcher#info=devDependencies)
 [![license](https://img.shields.io/github/license/testingbot/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://github.com/testingbot/testingbot-tunnel-launcher/blob/master/LICENSE)
-[![CircleCI](https://circleci.com/gh/testingbot/testingbot-tunnel-launcher.svg?style=svg)](https://circleci.com/gh/testingbot/testingbot-tunnel-launcher)
+[![CircleCI](https://circleci.com/gh/testingbot/testingbot-tunnel-launcher.svg?style=shield)](https://circleci.com/gh/testingbot/testingbot-tunnel-launcher)
 
 A library to download and launch TestingBot Tunnel.
 
@@ -86,7 +86,7 @@ testingbotTunnel(options, function(err, tunnel) {
 
 You can pass the TestingBot credentials as `apiKey` and `apiSecret` in the options.
 
-You can also create a ~/.testingbot file with apiKey:apiSecret as content
+You can also create a `~/.testingbot` file with `apiKey:apiSecret` as content
 
 
 ## Testing
@@ -96,6 +96,11 @@ npm test
 ```
 
 ## Changelog
+
+### v1.1.0
+- Get rid of exit handlers, they're causing issues #14
+- Add tests
+- Update dependencies
 
 ### v1.0.7
 - Properly handle SIGINT, exit and uncaughtException
