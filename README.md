@@ -2,9 +2,8 @@
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/testingbot/testingbot-tunnel-launcher.svg)](https://greenkeeper.io/)
 [![npm](https://img.shields.io/npm/v/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://www.npmjs.com/package/testingbot-tunnel-launcher)
-[![Dependency Status](https://img.shields.io/david/testingbot/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://david-dm.org/testingbot/testingbot-tunnel-launcher)
-[![devDependency Status](https://img.shields.io/david/dev/testingbot/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://david-dm.org/testingbot/testingbot-tunnel-launcher#info=devDependencies)
-[![license](https://img.shields.io/github/license/testingbot/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://github.com/testingbot/testingbot-tunnel-launcher/blob/master/LICENSE)
+[![dependencies Status](https://david-dm.org/testingbot/testingbot-tunnel-launcher/status.svg)](https://david-dm.org/testingbot/testingbot-tunnel-launcher)
+[![devDependencies Status](https://david-dm.org/testingbot/testingbot-tunnel-launcher/dev-status.svg)](https://david-dm.org/testingbot/testingbot-tunnel-launcher?type=dev)
 [![CircleCI](https://circleci.com/gh/testingbot/testingbot-tunnel-launcher.svg?style=shield)](https://circleci.com/gh/testingbot/testingbot-tunnel-launcher)
 
 A library to download and launch TestingBot Tunnel.
@@ -100,7 +99,7 @@ npm test
 ## Changelog
 
 ### v1.1.0
-- Get rid of exit handlers, they're causing issues #14
+- Get rid of exit handlers, they're causing issues
 - Add tests
 - Update dependencies
 
