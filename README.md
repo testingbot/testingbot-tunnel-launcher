@@ -1,4 +1,8 @@
 # testingbot-tunnel-launcher
+[![npm](https://img.shields.io/npm/v/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://www.npmjs.com/package/testingbot-tunnel-launcher)
+[![Dependency Status](https://img.shields.io/david/testingbot/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://david-dm.org/testingbot/testingbot-tunnel-launcher)
+[![devDependency Status](https://img.shields.io/david/dev/testingbot/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://david-dm.org/testingbot/testingbot-tunnel-launcher#info=devDependencies)
+[![license](https://img.shields.io/github/license/testingbot/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://github.com/testingbot/testingbot-tunnel-launcher/blob/master/LICENSE)
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/testingbot/testingbot-tunnel-launcher.svg)](https://greenkeeper.io/)
 [![npm](https://img.shields.io/npm/v/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://www.npmjs.com/package/testingbot-tunnel-launcher)
