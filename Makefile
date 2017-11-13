@@ -9,4 +9,7 @@ clean:
 lint:
 		eslint lib/
 test: clean lint
-	mocha --reporter spec $(MOCHAFLAGS)
+	mocha --exit --reporter spec $(MOCHAFLAGS)
+
+version:
+	node -e "console.log(require('./package.json').version)"

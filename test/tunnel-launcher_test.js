@@ -19,10 +19,10 @@ describe('Tunnel Launcher', function() {
 	});
 
 	it('should correctly return an error when the tunnel returns an error', function(done) {
-		this.timeout(20000);
+		this.timeout(10000);
 		tunnelLauncher({ apiKey: 'fake', apiSecret: 'fake' }, function(err, tunnel) {
 			assert.equal(tunnel, null);
-			assert.equal(err.message, "Invalid credentials. Please supply the correct key/secret obtained from TestingBot.com");
+			assert.equal(err.message, "An error ocurred: 401 Unauthorized. Please supply the correct API key and API secret");
 			done();
 		});
 	});

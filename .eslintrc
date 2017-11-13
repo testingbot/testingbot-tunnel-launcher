@@ -1,5 +1,4 @@
 {
-  "extends": "standard",
   "rules": {
     "indent": [2, 4],
     "no-var": 2,
