@@ -28,4 +28,3 @@ node_modules
 
  # TestingBot specific files
 *.jar
-build/
