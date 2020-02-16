@@ -4,7 +4,7 @@
 [![npm](https://img.shields.io/npm/v/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://www.npmjs.com/package/testingbot-tunnel-launcher)
 [![dependencies Status](https://david-dm.org/testingbot/testingbot-tunnel-launcher/status.svg)](https://david-dm.org/testingbot/testingbot-tunnel-launcher)
 [![devDependencies Status](https://david-dm.org/testingbot/testingbot-tunnel-launcher/dev-status.svg)](https://david-dm.org/testingbot/testingbot-tunnel-launcher?type=dev)
-[![CircleCI](https://circleci.com/gh/testingbot/testingbot-tunnel-launcher.svg?style=shield)](https://circleci.com/gh/testingbot/testingbot-tunnel-launcher)
+[![Build Status](https://travis-ci.org/testingbot/testingbot-tunnel-launcher.svg?branch=master)](https://travis-ci.org/testingbot/testingbot-tunnel-launcher)
 
 A library to download and launch TestingBot Tunnel.
 
