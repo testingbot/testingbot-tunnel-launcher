@@ -22,7 +22,7 @@ describe('Tunnel Launcher', function() {
 		this.timeout(10000);
 		tunnelLauncher({ apiKey: 'fake', apiSecret: 'fake' }, function(err, tunnel) {
 			assert.equal(tunnel, null);
-			assert.equal(err.message, "An error ocurred: 401 Unauthorized. Please supply the correct API key and API secret");
+			assert.equal(err.message, "Invalid credentials. Please supply the correct key/secret obtained from TestingBot.com");
 			done();
 		});
 	});
