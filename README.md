@@ -98,6 +98,9 @@ npm test
 
 ## Changelog
 
+### v1.1.8
+- Update dependencies
+
 ### v1.1.0
 - Get rid of exit handlers, they're causing issues
 - Add tests
