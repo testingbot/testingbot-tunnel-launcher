@@ -98,6 +98,12 @@ npm test
 
 ## Changelog
 
+### v1.1.11
+- Throw error when user does not have any minutes left
+
+### v1.1.9
+- Add corrupt download check for tunnel binary
+
 ### v1.1.8
 - Update dependencies
 
