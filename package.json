@@ -6,7 +6,7 @@
   "homepage": "https://github.com/testingbot/testingbot-tunnel-launcher",
   "scripts": {
     "lint": "eslint lib/",
-    "test": "make test",
+    "test": "mocha --exit --reporter spec",
     "build": "babel lib -d build"
   },
   "dependencies": {
