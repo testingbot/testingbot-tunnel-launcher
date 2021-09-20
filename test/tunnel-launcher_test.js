@@ -27,4 +27,16 @@ describe('Tunnel Launcher', function() {
 		});
 	});
 
+	it('should correctly parse arguments', function(done) {
+		const args = tunnelLauncher.createArgs({ apiKey: 'fake', apiSecret: 'fake', tunnelIdentifier: 'my-tunnel' });
+		assert(args.indexOf('--tunnel-identifier') > -1);
+		assert(args.indexOf('my-tunnel') > -1);
+
+		const args2 = tunnelLauncher.createArgs({ apiKey: 'fake', apiSecret: 'fake', debug: true });
+		assert(args2.indexOf('--debug') > -1);
+
+		const args3 = tunnelLauncher.createArgs({ apiKey: 'fake', apiSecret: 'fake', debug: null });
+		assert.equal(args3.indexOf('--debug'), -1);
+		done();
+	});
 });

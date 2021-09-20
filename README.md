@@ -1,6 +1,5 @@
 # testingbot-tunnel-launcher
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/testingbot/testingbot-tunnel-launcher.svg)](https://greenkeeper.io/)
 [![npm](https://img.shields.io/npm/v/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://www.npmjs.com/package/testingbot-tunnel-launcher)
 [![dependencies Status](https://david-dm.org/testingbot/testingbot-tunnel-launcher/status.svg)](https://david-dm.org/testingbot/testingbot-tunnel-launcher)
 [![devDependencies Status](https://david-dm.org/testingbot/testingbot-tunnel-launcher/dev-status.svg)](https://david-dm.org/testingbot/testingbot-tunnel-launcher?type=dev)
@@ -71,7 +70,10 @@ var testingbotTunnel = require('testingbot-tunnel-launcher'),
     logfile: null,
 
     // Change the tunnel version - see versions on https://testingbot.com/support/other/tunnel
-    tunnelVersion: "1.19" // or 2.1 (Java 8)
+    tunnelVersion: "1.19", // or 2.1 (Java 8)
+
+    // Gives this tunnel a unique identifier
+    tunnelIdentifier: "myIdentifier"
   };
 
 testingbotTunnel(options, function(err, tunnel) {
@@ -97,6 +99,10 @@ npm test
 ```
 
 ## Changelog
+
+### v1.1.11
+- Add support for `tunnelIdentifier`
+- Improve parsing of arguments passed to the tunnel
 
 ### v1.1.11
 - Throw error when user does not have any minutes left
