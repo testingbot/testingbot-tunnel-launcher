@@ -17,7 +17,7 @@ npm install testingbot-tunnel-launcher
 ### Simple Usage
 
 ```javascript
-var testingbotTunnel = require('testingbot-tunnel-launcher');
+const testingbotTunnel = require('testingbot-tunnel-launcher');
 
 testingbotTunnel({
   apiKey: 'key',
@@ -40,39 +40,38 @@ testingbotTunnel({
 
 ```javascript
 
-var testingbotTunnel = require('testingbot-tunnel-launcher'),
-  options = {
+const testingbotTunnel = require('testingbot-tunnel-launcher')
+const options = {
+  // The TestingBot API key which you can get for free, listed in the TestingBot member area
+  apiKey: 'key',
 
-    // The TestingBot API key which you can get for free, listed in our member area
-    apiKey: 'key',
+  // The TestingBot API secret which you can get for free, listed in the TestingBot member area
+  apiSecret: 'secret',
 
-    // The TestingBot API secret which you can get for free, listed in our member area
-    apiSecret: 'secret',
+  // More verbose output from the tunnel
+  verbose: true,
 
-    // More verbose output from the tunnel
-    verbose: true,
+  // Port on which the tunnel Selenium relay will listen for
+  // requests. Default 4445. (optional)
+  se-port: null,
 
-    // Port on which the tunnel Selenium relay will listen for
-    // requests. Default 4445. (optional)
-    se-port: null,
+  // Proxy host and port the tunnel can use to connect to an upstream proxy
+  // e.g. "localhost:1234" (optional)
+  proxy: null,
 
-    // Proxy host and port the tunnel can use to connect to an upstream proxy
-    // e.g. "localhost:1234" (optional)
-    proxy: null,
+  // a comma-separated list of domains that
+  // will not go through the tunnel. (optional)
+  fast-fail-regexps: null,
 
-    // a comma-separated list of domains that
-    // will not go through the tunnel. (optional)
-    fast-fail-regexps: null,
+  // Write logging output to this logfile (optional)
+  logfile: null,
 
-    // Write logging output to this logfile (optional)
-    logfile: null,
+  // Change the tunnel version - see versions on https://testingbot.com/support/other/tunnel/changelog.html
+  tunnelVersion: "4.0",
 
-    // Change the tunnel version - see versions on https://testingbot.com/support/other/tunnel/changelog.html
-    tunnelVersion: "4.0",
-
-    // Gives this tunnel a unique identifier
-    tunnelIdentifier: "myIdentifier"
-  };
+  // Gives this tunnel a unique identifier
+  tunnelIdentifier: "myIdentifier"
+};
 
 testingbotTunnel(options, function(err, tunnel) {
   console.log("Started Tunnel");
@@ -85,9 +84,9 @@ testingbotTunnel(options, function(err, tunnel) {
 
 ### Credentials
 
-You can pass the TestingBot credentials as `apiKey` and `apiSecret` in the options.
+You can pass the [TestingBot credentials](https://testingbot.com/members) as `apiKey` and `apiSecret` in the options.
 
-You can also create a `~/.testingbot` file with `apiKey:apiSecret` as content
+You can also create a `.testingbot` file in your `$HOME` directory, with `apiKey:apiSecret` as contents.
 
 
 ## Testing
@@ -137,7 +136,6 @@ npm test
 
 ### v1.0.0
 - First release of testingbot-tunnel-launcher
-
 
 
 ## MIT license
