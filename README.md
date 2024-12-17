@@ -1,9 +1,9 @@
 # testingbot-tunnel-launcher
 
 [![npm](https://img.shields.io/npm/v/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://www.npmjs.com/package/testingbot-tunnel-launcher)
-[![Build Status](https://travis-ci.org/testingbot/testingbot-tunnel-launcher.svg?branch=master)](https://travis-ci.org/testingbot/testingbot-tunnel-launcher)
+[![Tests](https://github.com/testingbot/testingbot-tunnel-launcher/actions/workflows/test.yml/badge.svg)](https://github.com/testingbot/testingbot-tunnel-launcher/actions/workflows/test.yml)
 
-A library to download and launch TestingBot Tunnel.
+A library to download and launch [TestingBot Tunnel](https://testingbot.com/support/other/tunnel).
 
 ## Installation
 
