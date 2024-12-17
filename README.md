@@ -1,8 +1,6 @@
 # testingbot-tunnel-launcher
 
 [![npm](https://img.shields.io/npm/v/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://www.npmjs.com/package/testingbot-tunnel-launcher)
-[![dependencies Status](https://david-dm.org/testingbot/testingbot-tunnel-launcher/status.svg)](https://david-dm.org/testingbot/testingbot-tunnel-launcher)
-[![devDependencies Status](https://david-dm.org/testingbot/testingbot-tunnel-launcher/dev-status.svg)](https://david-dm.org/testingbot/testingbot-tunnel-launcher?type=dev)
 [![Build Status](https://travis-ci.org/testingbot/testingbot-tunnel-launcher.svg?branch=master)](https://travis-ci.org/testingbot/testingbot-tunnel-launcher)
 
 A library to download and launch TestingBot Tunnel.
@@ -69,8 +67,8 @@ var testingbotTunnel = require('testingbot-tunnel-launcher'),
     // Write logging output to this logfile (optional)
     logfile: null,
 
-    // Change the tunnel version - see versions on https://testingbot.com/support/other/tunnel
-    tunnelVersion: "1.19", // or 2.1 (Java 8)
+    // Change the tunnel version - see versions on https://testingbot.com/support/other/tunnel/changelog.html
+    tunnelVersion: "4.0",
 
     // Gives this tunnel a unique identifier
     tunnelIdentifier: "myIdentifier"
@@ -99,6 +97,12 @@ npm test
 ```
 
 ## Changelog
+
+### v1.1.13
+- Add support for `noBump`
+
+### v1.1.12
+- Improve error handling
 
 ### v1.1.11
 - Add support for `tunnelIdentifier`
