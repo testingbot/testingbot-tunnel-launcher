@@ -2,7 +2,7 @@
   "author": "TestingBot <info@testingbot.com> (testingbot.com)",
   "name": "testingbot-tunnel-launcher",
   "description": "A wrapper around TestingBot's Tunnel",
-  "version": "1.1.14",
+  "version": "1.1.15",
   "homepage": "https://github.com/testingbot/testingbot-tunnel-launcher",
   "scripts": {
     "lint": "eslint lib/",
