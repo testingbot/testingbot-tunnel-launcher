@@ -1,4 +1,4 @@
-var downloader = require('./../lib/downloader');
+var downloader = require('./../build/downloader');
 var assert = require('assert');
 var os = require('os');
 var path = require('path');
