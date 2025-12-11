@@ -6,6 +6,9 @@
     "prefer-const": 2,
     "prefer-template": 2
   },
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "requireConfigFile": false
+  },
   "globals": {}
 }
