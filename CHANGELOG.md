@@ -1,5 +1,8 @@
 ## Changelog
 
+### v1.1.17
+- Do not include the jar in the NPM package
+
 ### v1.1.16
 - Improve the Java check to make sure it is available and at least JDK11
 - Provide async/await functionality
