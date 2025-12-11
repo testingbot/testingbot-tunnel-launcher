@@ -1,5 +1,5 @@
-var tunnelLauncher = require('./../build/tunnel-launcher');
-var assert = require('assert');
+const tunnelLauncher = require('./../build/tunnel-launcher');
+const assert = require('assert');
 
 describe('Java Version Check', function() {
 	describe('checkJava', function() {
