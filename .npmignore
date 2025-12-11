@@ -2,4 +2,6 @@
 /.git
 /.gitignore
 /.npmignore
+/.github
+/test
 *.jar
