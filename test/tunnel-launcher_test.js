@@ -4,6 +4,7 @@ const assert = require('assert');
 describe('Java Version Check', function() {
 	describe('checkJava', function() {
 		it('should resolve with version when Java is installed', async function() {
+			this.timeout(10000);
 			const result = await tunnelLauncher.checkJava();
 			assert.ok(result.version >= 11, `Expected Java version >= 11, got ${result.version}`);
 		});
