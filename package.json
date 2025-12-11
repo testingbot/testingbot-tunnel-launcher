@@ -9,9 +9,6 @@
     "test": "mocha --exit --reporter spec",
     "build": "babel lib -d build"
   },
-  "dependencies": {
-    "async": "^3.2.6"
-  },
   "devDependencies": {
     "@babel/cli": "^7.28.3",
     "@babel/core": "^7.28.5",
