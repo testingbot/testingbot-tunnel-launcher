@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/testingbot-tunnel-launcher.svg?maxAge=2592000)](https://www.npmjs.com/package/testingbot-tunnel-launcher)
 [![Tests](https://github.com/testingbot/testingbot-tunnel-launcher/actions/workflows/test.yml/badge.svg)](https://github.com/testingbot/testingbot-tunnel-launcher/actions/workflows/test.yml)
 
-A library to download and launch [TestingBot Tunnel](https://testingbot.com/support/other/tunnel).
+A library to download and launch [TestingBot Tunnel](https://testingbot.com/support/tunnel).
 
 ## Installation
 
@@ -20,8 +20,8 @@ npm install testingbot-tunnel-launcher
 const testingbotTunnel = require('testingbot-tunnel-launcher');
 
 testingbotTunnel({
-  apiKey: 'key',
-  apiSecret: 'secret',
+  apiKey: process.env.TB_KEY,
+  apiSecret: process.env.TB_SECRET,
   verbose: true
 }, function (err, tunnel) {
   if (err) {
@@ -86,7 +86,7 @@ testingbotTunnel(options, function(err, tunnel) {
 
 You can pass the [TestingBot credentials](https://testingbot.com/members) as `apiKey` and `apiSecret` in the options.
 
-You can also create a `.testingbot` file in your `$HOME` directory, with `apiKey:apiSecret` as contents.
+You can also create a `~/.testingbot` file in your `$HOME` directory, with `apiKey:apiSecret` as contents.
 
 
 ## Testing
