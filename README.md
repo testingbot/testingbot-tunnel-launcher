@@ -14,7 +14,7 @@ npm install testingbot-tunnel-launcher
 ## Usage
 
 
-### Simple Usage
+### Simple Usage (Callback)
 
 ```javascript
 const testingbotTunnel = require('testingbot-tunnel-launcher');
@@ -36,10 +36,36 @@ testingbotTunnel({
 });
 ```
 
-### Advanced Usage
+### Simple Usage (Async/Await)
 
 ```javascript
+const testingbotTunnel = require('testingbot-tunnel-launcher');
 
+async function runTests() {
+  try {
+    const tunnel = await testingbotTunnel.downloadAndRunAsync({
+      apiKey: process.env.TB_KEY,
+      apiSecret: process.env.TB_SECRET,
+      verbose: true
+    });
+    console.log("Tunnel ready");
+
+    // Run your tests here...
+
+    // Close the tunnel when done
+    await testingbotTunnel.killAsync();
+    console.log("Tunnel closed completely");
+  } catch (err) {
+    console.error(err.message);
+  }
+}
+
+runTests();
+```
+
+### Options
+
+```javascript
 const testingbotTunnel = require('testingbot-tunnel-launcher')
 const options = {
   // The TestingBot API key which you can get for free, listed in the TestingBot member area
@@ -53,15 +79,15 @@ const options = {
 
   // Port on which the tunnel Selenium relay will listen for
   // requests. Default 4445. (optional)
-  se-port: null,
+  'se-port': 4445,
 
   // Proxy host and port the tunnel can use to connect to an upstream proxy
   // e.g. "localhost:1234" (optional)
   proxy: null,
 
-  // a comma-separated list of domains that
+  // A comma-separated list of domains that
   // will not go through the tunnel. (optional)
-  fast-fail-regexps: null,
+  'fast-fail-regexps': null,
 
   // Write logging output to this logfile (optional)
   logfile: null,
@@ -73,7 +99,16 @@ const options = {
   tunnelIdentifier: "myIdentifier",
 
   // Share this tunnel with other team members on TestingBot
-  shared: true
+  shared: true,
+
+  // Timeout in seconds for the tunnel to start (default: 90)
+  timeout: 120,
+
+  // Disable SSL bumping/rewriting
+  noBump: false,
+
+  // Disable caching
+  noCache: false
 };
 
 testingbotTunnel(options, function(err, tunnel) {
@@ -82,7 +117,6 @@ testingbotTunnel(options, function(err, tunnel) {
     console.log("Closed tunnel");
   });
 });
-
 ```
 
 ### Credentials
