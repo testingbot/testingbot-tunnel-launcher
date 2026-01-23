@@ -70,7 +70,10 @@ const options = {
   tunnelVersion: "4.0",
 
   // Gives this tunnel a unique identifier
-  tunnelIdentifier: "myIdentifier"
+  tunnelIdentifier: "myIdentifier",
+
+  // Share this tunnel with other team members on TestingBot
+  shared: true
 };
 
 testingbotTunnel(options, function(err, tunnel) {

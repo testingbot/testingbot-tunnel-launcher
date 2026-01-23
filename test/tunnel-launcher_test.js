@@ -141,9 +141,17 @@ describe('Tunnel Launcher (callback API)', function() {
 		const args5 = tunnelLauncher.createArgs({ apiKey: 'fake', apiSecret: 'fake', noCache: true });
 		assert.ok(args5.includes('--nocache'), 'NoCache flag should be included when noCache is true');
 
+		// Test for shared flag
+		const args6 = tunnelLauncher.createArgs({ apiKey: 'fake', apiSecret: 'fake', shared: true });
+		assert.ok(args6.includes('--shared'), 'Shared flag should be included when shared is true');
+
+		// Test for shared flag being omitted (should not include if false)
+		const args7 = tunnelLauncher.createArgs({ apiKey: 'fake', apiSecret: 'fake', shared: false });
+		assert.ok(!args7.includes('--shared'), 'Shared flag should not be included when shared is false');
+
 		// Test default flags
-		const args6 = tunnelLauncher.createArgs({ apiKey: 'fake', apiSecret: 'fake' });
-		assert.ok(!args6.includes('--nocache', '--nobump'));
+		const args8 = tunnelLauncher.createArgs({ apiKey: 'fake', apiSecret: 'fake' });
+		assert.ok(!args8.includes('--nocache', '--nobump', '--shared'));
 
 		done();
 	});
