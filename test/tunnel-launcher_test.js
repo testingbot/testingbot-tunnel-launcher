@@ -93,6 +93,85 @@ describe('Java Version Check', function() {
 	});
 });
 
+describe('Options Validation', function() {
+	describe('validateOptions', function() {
+		it('should accept valid options', function() {
+			// Should not throw
+			tunnelLauncher.validateOptions({ apiKey: 'key', apiSecret: 'secret' });
+			tunnelLauncher.validateOptions({ apiKey: 'key', apiSecret: 'secret', tunnelIdentifier: 'my-tunnel' });
+			tunnelLauncher.validateOptions({ apiKey: 'key', apiSecret: 'secret', tunnelVersion: '4.0' });
+			tunnelLauncher.validateOptions({ apiKey: 'key', apiSecret: 'secret', timeout: 120 });
+			tunnelLauncher.validateOptions({}); // Empty options should be valid
+		});
+
+		it('should reject non-string apiKey', function() {
+			assert.throws(() => {
+				tunnelLauncher.validateOptions({ apiKey: 123 });
+			}, /apiKey must be a string/);
+		});
+
+		it('should reject non-string apiSecret', function() {
+			assert.throws(() => {
+				tunnelLauncher.validateOptions({ apiSecret: 123 });
+			}, /apiSecret must be a string/);
+		});
+
+		it('should reject empty apiKey', function() {
+			assert.throws(() => {
+				tunnelLauncher.validateOptions({ apiKey: '' });
+			}, /apiKey cannot be empty/);
+			assert.throws(() => {
+				tunnelLauncher.validateOptions({ apiKey: '   ' });
+			}, /apiKey cannot be empty/);
+		});
+
+		it('should reject empty apiSecret', function() {
+			assert.throws(() => {
+				tunnelLauncher.validateOptions({ apiSecret: '' });
+			}, /apiSecret cannot be empty/);
+		});
+
+		it('should reject non-string tunnelVersion', function() {
+			assert.throws(() => {
+				tunnelLauncher.validateOptions({ tunnelVersion: 4.0 });
+			}, /tunnelVersion must be a string/);
+		});
+
+		it('should reject non-string tunnelIdentifier', function() {
+			assert.throws(() => {
+				tunnelLauncher.validateOptions({ tunnelIdentifier: 123 });
+			}, /tunnelIdentifier must be a string/);
+		});
+
+		it('should reject invalid timeout', function() {
+			assert.throws(() => {
+				tunnelLauncher.validateOptions({ timeout: 'fast' });
+			}, /timeout must be a positive number/);
+			assert.throws(() => {
+				tunnelLauncher.validateOptions({ timeout: -10 });
+			}, /timeout must be a positive number/);
+			assert.throws(() => {
+				tunnelLauncher.validateOptions({ timeout: 0 });
+			}, /timeout must be a positive number/);
+		});
+
+		it('should reject non-boolean shared', function() {
+			assert.throws(() => {
+				tunnelLauncher.validateOptions({ shared: 'true' });
+			}, /shared must be a boolean/);
+			assert.throws(() => {
+				tunnelLauncher.validateOptions({ shared: 1 });
+			}, /shared must be a boolean/);
+		});
+
+		it('should accept boolean shared', function() {
+			// Should not throw
+			tunnelLauncher.validateOptions({ shared: true });
+			tunnelLauncher.validateOptions({ shared: false });
+		});
+	});
+});
+
 describe('Tunnel Launcher (callback API)', function() {
 
 	it('should error when trying to kill a non-existing tunnel', function(done) {
