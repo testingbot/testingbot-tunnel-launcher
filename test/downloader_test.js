@@ -1,4 +1,4 @@
-const downloader = require('./../build/downloader');
+const downloader = require('./../lib/downloader');
 const assert = require('assert');
 const os = require('os');
 const path = require('path');

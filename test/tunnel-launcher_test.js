@@ -1,4 +1,4 @@
-const tunnelLauncher = require('./../build/tunnel-launcher');
+const tunnelLauncher = require('./../lib/tunnel-launcher');
 const assert = require('assert');
 
 describe('Java Version Check', function() {
