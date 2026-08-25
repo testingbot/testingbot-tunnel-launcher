@@ -127,6 +127,20 @@ You can also create a `~/.testingbot` file in your `$HOME` directory, with `apiK
 
 The credentials are handed to the tunnel through the `TESTINGBOT_KEY` and `TESTINGBOT_SECRET` environment variables instead of the command line, so they do not show up in the process list. They are also redacted from the output when `verbose` is enabled.
 
+### Running more than one tunnel
+
+Every tunnel keeps its own state, so several tunnels can run next to each other. Give each one its own `tunnelIdentifier` and hold on to the tunnel you get back to close it:
+
+```javascript
+const first = await testingbotTunnel.downloadAndRunAsync({ ...options, tunnelIdentifier: 'first' });
+const second = await testingbotTunnel.downloadAndRunAsync({ ...options, tunnelIdentifier: 'second' });
+
+first.close();
+await testingbotTunnel.killAllAsync();
+```
+
+`killAsync` closes the tunnel that was started last, `killAllAsync` closes all of them and `activeTunnels()` returns the ones that are still running.
+
 ### Where the tunnel is stored
 
 The tunnel jar is downloaded into the directory of this package. When that directory can not be written to, which is the case for global installs and read-only images, it is stored in the cache directory of the user (`~/.cache/testingbot-tunnel-launcher` on Linux, `~/Library/Caches/testingbot-tunnel-launcher` on macOS and `%LOCALAPPDATA%` on Windows).

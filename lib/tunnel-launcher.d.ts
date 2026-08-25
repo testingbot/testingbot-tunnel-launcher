@@ -87,20 +87,33 @@ declare namespace downloadAndRun {
     export function downloadAndRunAsync(options?: TunnelOptions): Promise<TunnelProcess>;
 
     /**
-     * Kill the active tunnel (async version).
+     * Kill the tunnel that was started last (async version).
      * Resolves once the tunnel process has really exited.
      */
     export function killAsync(): Promise<void>;
 
     /**
-     * Download the tunnel JAR file
+     * Kill every tunnel this process started (async version).
+     * Resolves once all of them have really exited.
      */
-    export function downloadAsync(options?: TunnelOptions): Promise<void>;
+    export function killAllAsync(): Promise<void>;
 
     /**
-     * Start the tunnel process (requires JAR to be downloaded first)
+     * Every tunnel this process started that is still running,
+     * in the order they were started
      */
-    export function startTunnelAsync(options?: TunnelOptions): Promise<TunnelProcess>;
+    export function activeTunnels(): TunnelProcess[];
+
+    /**
+     * Download the tunnel JAR file, returns the location of the jar
+     */
+    export function downloadAsync(options?: TunnelOptions): Promise<string>;
+
+    /**
+     * Start the tunnel process (requires JAR to be downloaded first).
+     * Defaults to the jar that was downloaded last.
+     */
+    export function startTunnelAsync(options?: TunnelOptions, jarLocation?: string): Promise<TunnelProcess>;
 
     /**
      * Check if Java is installed and meets minimum version requirement
@@ -128,7 +141,7 @@ declare namespace downloadAndRun {
      * The API key and secret are not included, they are passed
      * to the tunnel through the environment.
      */
-    export function createArgs(options: TunnelOptions): string[];
+    export function createArgs(options: TunnelOptions, jarLocation?: string): string[];
 
     /**
      * Create the environment for the tunnel process, holding the

@@ -31,16 +31,19 @@ async function useAsyncApi(): Promise<void> {
     const tunnel: tunnelLauncher.TunnelProcess = await tunnelLauncher.downloadAndRunAsync(options);
     tunnel.close();
 
-    await tunnelLauncher.downloadAsync(options);
-    await tunnelLauncher.startTunnelAsync(options);
+    const jarLocation: string = await tunnelLauncher.downloadAsync(options);
+    await tunnelLauncher.startTunnelAsync(options, jarLocation);
     await tunnelLauncher.killAsync();
+    await tunnelLauncher.killAllAsync();
+
+    const running: tunnelLauncher.TunnelProcess[] = tunnelLauncher.activeTunnels();
     await tunnelLauncher.stopProcess(tunnel, 1000);
 
     const java: tunnelLauncher.JavaVersionResult = await tunnelLauncher.checkJava();
     const version: number | null = java.version;
     const validation: tunnelLauncher.JavaValidationResult = tunnelLauncher.validateJavaVersion('openjdk version "21"');
 
-    const args: string[] = tunnelLauncher.createArgs(options);
+    const args: string[] = tunnelLauncher.createArgs(options, jarLocation);
     const redactedArgs: string[] = tunnelLauncher.redactCredentials(args, options);
     const redactedLine: string = tunnelLauncher.redactCredentials('some output', options);
     const env: NodeJS.ProcessEnv = tunnelLauncher.createEnv(options);
@@ -51,7 +54,7 @@ async function useAsyncApi(): Promise<void> {
 
     tunnelLauncher.validateOptions(options);
 
-    void [version, validation, redactedArgs, redactedLine, env, valid, tunnelLauncher.parseJavaVersion('')];
+    void [version, validation, redactedArgs, redactedLine, env, valid, running, tunnelLauncher.parseJavaVersion('')];
 }
 
 void useAsyncApi;

@@ -634,3 +634,64 @@ describe('createLineReader', function() {
 		assert.deepEqual(lines, ['first', 'second']);
 	});
 });
+
+describe('running several tunnels', function() {
+	const fs = require('fs');
+	const path = require('path');
+	const crypto = require('crypto');
+
+	function corruptJar() {
+		const jar = path.join(os.tmpdir(), `not_a_jar_${crypto.randomBytes(6).toString('hex')}.jar`);
+		fs.writeFileSync(jar, 'this is not a jar file');
+		return jar;
+	}
+
+	function readyFileDirectories() {
+		return fs.readdirSync(os.tmpdir()).filter(entry => entry.startsWith('testingbot-tunnel-'));
+	}
+
+	it('should use the jar it is given instead of the last one downloaded', function() {
+		const args = tunnelLauncher.createArgs({ apiKey: 'k', apiSecret: 's' }, '/somewhere/else.jar');
+		assert.equal(args[args.indexOf('-jar') + 1], '/somewhere/else.jar');
+	});
+
+	it('should report the location of the jar it downloaded', async function() {
+		this.timeout(120000);
+		const jarLocation = await tunnelLauncher.downloadAsync({});
+		assert.ok(jarLocation, 'The location of the jar should be returned');
+		assert.ok(fs.existsSync(jarLocation), `Expected a jar at ${jarLocation}`);
+	});
+
+	it('should keep the state of tunnels started next to each other apart', async function() {
+		this.timeout(60000);
+		const jar = corruptJar();
+		const before = readyFileDirectories();
+
+		try {
+			// Neither tunnel can start, both should be told about their own failure
+			const results = await Promise.allSettled([
+				tunnelLauncher.startTunnelAsync({ apiKey: 'k', apiSecret: 's' }, jar),
+				tunnelLauncher.startTunnelAsync({ apiKey: 'k', apiSecret: 's' }, jar)
+			]);
+
+			assert.deepEqual(results.map(result => result.status), ['rejected', 'rejected']);
+			for (const result of results) {
+				assert.ok(result.reason.message.includes('Could not start TestingBot Tunnel'), `Unexpected error: ${result.reason.message}`);
+			}
+
+			assert.deepEqual(tunnelLauncher.activeTunnels(), [], 'No tunnel should be left behind');
+			assert.deepEqual(readyFileDirectories(), before, 'The readyfile directories should be cleaned up');
+		} finally {
+			fs.unlinkSync(jar);
+		}
+	});
+
+	it('should reject killAsync when no tunnel is running', async function() {
+		await assert.rejects(() => tunnelLauncher.killAsync(), /no active tunnel/);
+	});
+
+	it('should do nothing when killing all tunnels while none are running', async function() {
+		await tunnelLauncher.killAllAsync();
+		assert.deepEqual(tunnelLauncher.activeTunnels(), []);
+	});
+});
