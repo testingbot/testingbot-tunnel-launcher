@@ -1,60 +1,81 @@
 import { ChildProcess } from 'child_process';
 
-export interface TunnelOptions {
-    /** TestingBot API key */
-    apiKey?: string;
-    /** TestingBot API secret */
-    apiSecret?: string;
-    /** Enable verbose output */
-    verbose?: boolean;
-    /** Port for the Selenium relay (default: 4445) */
-    'se-port'?: number;
-    /** Upstream proxy host and port (e.g. "localhost:1234") */
-    proxy?: string;
-    /** Comma-separated list of domains to bypass the tunnel */
-    'fast-fail-regexps'?: string;
-    /** Path to write log output */
-    logfile?: string;
-    /** Specific tunnel version to use */
-    tunnelVersion?: string;
-    /** Unique identifier for this tunnel */
-    tunnelIdentifier?: string;
-    /** Share tunnel with team members */
-    shared?: boolean;
-    /** Timeout in seconds for tunnel to start (default: 90) */
-    timeout?: number;
-    /** Disable SSL bumping/rewriting */
-    noBump?: boolean;
-    /** Disable caching */
-    noCache?: boolean;
-}
-
-export interface TunnelProcess extends ChildProcess {
-    /** Close the tunnel */
-    close(callback?: () => void): void;
-    /** Error message if tunnel failed to start */
-    error?: string;
-}
-
-export interface JavaVersionResult {
-    version: number | null;
-}
-
-export interface JavaValidationResult {
-    valid: boolean;
-    version: number | null;
-    error: string | null;
-}
-
 /**
  * Download and launch the TestingBot Tunnel (callback version)
  */
 declare function downloadAndRun(
-    options: TunnelOptions,
-    callback: (err: Error | null, tunnel?: TunnelProcess) => void
+    options: downloadAndRun.TunnelOptions,
+    callback: (err: Error | null, tunnel?: downloadAndRun.TunnelProcess) => void
 ): void;
 
 declare namespace downloadAndRun {
+    export interface TunnelOptions {
+        /** TestingBot API key */
+        apiKey?: string;
+        /** TestingBot API secret */
+        apiSecret?: string;
+        /** Enable verbose output */
+        verbose?: boolean;
+        /** Port for the Selenium relay (default: 4445) */
+        'se-port'?: number;
+        /** Upstream proxy host and port (e.g. "localhost:1234") */
+        proxy?: string;
+        /** Comma-separated list of domains to bypass the tunnel */
+        'fast-fail-regexps'?: string;
+        /** Path to write log output */
+        logfile?: string;
+        /** Specific tunnel version to use */
+        tunnelVersion?: string;
+        /** Unique identifier for this tunnel */
+        tunnelIdentifier?: string;
+        /** Share tunnel with team members */
+        shared?: boolean;
+        /** Timeout in seconds for tunnel to start (default: 90) */
+        timeout?: number;
+        /** Disable SSL bumping/rewriting */
+        noBump?: boolean;
+        /** Disable caching */
+        noCache?: boolean;
+        /** Enable debug messages */
+        debug?: boolean;
+        /** Use a custom DNS server (e.g. "8.8.8.8") */
+        dns?: string;
+        /** Basic authentication for specific hosts ("host:port:user:passwd") */
+        auth?: string;
+        /** Username and password for the upstream proxy ("user:pwd") */
+        'proxy-userpwd'?: string;
+        /** Proxy autoconfiguration, an http(s) URL */
+        pac?: string;
+        /** Connect to port 80 on the hub instead of the default port 4444 */
+        hubport?: number;
+        /** Port to launch the local proxy on (default: 8087) */
+        localproxy?: number;
+        /** Do not start the local proxy */
+        noproxy?: boolean;
+        /**
+         * Any other option is passed on to the tunnel as `--option value`.
+         * Booleans are passed as a flag without a value.
+         */
+        [option: string]: string | number | boolean | undefined;
+    }
+
+    export interface TunnelProcess extends ChildProcess {
+        /** Close the tunnel */
+        close(callback?: () => void): void;
+        /** Error message if tunnel failed to start */
+        error?: string;
+    }
+
+    export interface JavaVersionResult {
+        version: number | null;
+    }
+
+    export interface JavaValidationResult {
+        valid: boolean;
+        version: number | null;
+        error: string | null;
+    }
+
     /**
      * Kill the active tunnel (callback version)
      */
@@ -66,7 +87,8 @@ declare namespace downloadAndRun {
     export function downloadAndRunAsync(options?: TunnelOptions): Promise<TunnelProcess>;
 
     /**
-     * Kill the active tunnel (async version)
+     * Kill the active tunnel (async version).
+     * Resolves once the tunnel process has really exited.
      */
     export function killAsync(): Promise<void>;
 
@@ -102,9 +124,44 @@ declare namespace downloadAndRun {
     export function validateOptions(options: TunnelOptions): void;
 
     /**
-     * Create command line arguments from options
+     * Create command line arguments from options.
+     * The API key and secret are not included, they are passed
+     * to the tunnel through the environment.
      */
     export function createArgs(options: TunnelOptions): string[];
+
+    /**
+     * Create the environment for the tunnel process, holding the
+     * TESTINGBOT_KEY and TESTINGBOT_SECRET variables
+     */
+    export function createEnv(options: TunnelOptions): NodeJS.ProcessEnv;
+
+    /**
+     * Replace the API key and secret in a string or argument list with a placeholder
+     */
+    export function redactCredentials(value: string, options: TunnelOptions): string;
+    export function redactCredentials(value: string[], options: TunnelOptions): string[];
+
+    /**
+     * Check whether a cached jar file can be run
+     */
+    export function isJarValid(jarLocation: string): Promise<boolean>;
+
+    /**
+     * Create the path for the readyfile of a single tunnel, in a private directory
+     */
+    export function createReadyFilePath(): Promise<string>;
+
+    /**
+     * Remove the private directory holding the readyfile
+     */
+    export function removeReadyFilePath(readyFile: string): Promise<void>;
+
+    /**
+     * Stop a process and wait until it has exited,
+     * sending SIGKILL when it does not stop within the grace period
+     */
+    export function stopProcess(proc: ChildProcess, gracePeriod?: number): Promise<void>;
 }
 
 export = downloadAndRun;

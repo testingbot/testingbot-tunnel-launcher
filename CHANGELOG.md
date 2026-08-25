@@ -3,6 +3,11 @@
 ### v1.1.19
 - Pass the credentials to the tunnel via the `TESTINGBOT_KEY`/`TESTINGBOT_SECRET` environment variables instead of the command line, so they no longer appear in the process list
 - Redact the key and secret from the output when `verbose` is enabled
+- Do not redownload the jar when the JVM writes to stderr, for example when `JAVA_TOOL_OPTIONS` is set
+- Give every tunnel its own readyfile, so tunnels running next to each other no longer interfere with each other
+- `killAsync` now resolves once the tunnel has really exited, and kills the tunnel when it does not stop in time
+- Pass numeric options such as `se-port` with their value, and no longer pass `timeout` on to the tunnel, which refused to start because of it
+- Fix the type definitions, which did not compile because of the `export =` assignment
 
 ### v1.1.17
 - Do not include the jar in the NPM package

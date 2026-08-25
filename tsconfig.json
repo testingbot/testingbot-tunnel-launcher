@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "noEmit": true,
+        "target": "es2020",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "types": ["node"]
+    },
+    "include": ["test/types", "lib/tunnel-launcher.d.ts"]
+}

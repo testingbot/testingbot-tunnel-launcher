@@ -8,11 +8,14 @@
   "homepage": "https://github.com/testingbot/testingbot-tunnel-launcher",
   "scripts": {
     "lint": "eslint lib/",
-    "test": "mocha --exit --reporter spec"
+    "types": "tsc -p tsconfig.json",
+    "test": "npm run types && mocha --exit --reporter spec"
   },
   "devDependencies": {
+    "@types/node": "^20.19.43",
     "eslint": "^8.57.1",
-    "mocha": "^11.7.5"
+    "mocha": "^11.7.5",
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=18"

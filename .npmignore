@@ -5,3 +5,8 @@
 /.github
 /test
 *.jar
+/tsconfig.json
+/.claude
+/.serena
+/.editorconfig
+/.eslintrc

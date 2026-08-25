@@ -439,3 +439,31 @@ describe('stopProcess', function() {
 		await tunnelLauncher.stopProcess(proc);
 	});
 });
+
+describe('createArgs option handling', function() {
+	it('should pass numeric options with their value', function() {
+		const args = tunnelLauncher.createArgs({ apiKey: 'k', apiSecret: 's', 'se-port': 4445 });
+		assert.ok(args.includes('--se-port'), 'The option should be included');
+		assert.equal(args[args.indexOf('--se-port') + 1], '4445', 'The value should follow the option');
+	});
+
+	it('should not pass launcher options on to the tunnel', function() {
+		// The tunnel does not know --timeout and refuses to start when it is passed
+		const args = tunnelLauncher.createArgs({ apiKey: 'k', apiSecret: 's', timeout: 120 });
+		assert.ok(!args.includes('--timeout'), 'timeout is handled by the launcher itself');
+	});
+
+	it('should skip empty and unset options', function() {
+		const args = tunnelLauncher.createArgs({ apiKey: 'k', apiSecret: 's', logfile: '', proxy: null, dns: undefined });
+		assert.ok(!args.includes('--logfile'));
+		assert.ok(!args.includes('--proxy'));
+		assert.ok(!args.includes('--dns'));
+	});
+
+	it('should pass booleans as a flag without a value', function() {
+		const args = tunnelLauncher.createArgs({ apiKey: 'k', apiSecret: 's', shared: true, noCache: false });
+		assert.ok(args.includes('--shared'));
+		assert.ok(!args.includes('--nocache'));
+		assert.equal(args[args.indexOf('--shared') + 1], undefined, 'A flag should not be followed by a value');
+	});
+});
