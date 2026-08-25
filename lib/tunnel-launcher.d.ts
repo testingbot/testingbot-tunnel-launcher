@@ -143,6 +143,14 @@ declare namespace downloadAndRun {
     export function redactCredentials(value: string[], options: TunnelOptions): string[];
 
     /**
+     * Read a stream chunk by chunk and hand out whole lines
+     */
+    export function createLineReader(onLine: (line: string) => void): {
+        (chunk: string | Buffer): void;
+        flush(): void;
+    };
+
+    /**
      * Check whether a cached jar file can be run
      */
     export function isJarValid(jarLocation: string): Promise<boolean>;

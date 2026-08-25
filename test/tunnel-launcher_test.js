@@ -581,3 +581,56 @@ describe('jar location', function() {
 		}
 	});
 });
+
+describe('createLineReader', function() {
+	it('should join a line that arrives in pieces', function() {
+		const lines = [];
+		const read = tunnelLauncher.createLineReader(line => lines.push(line));
+
+		// The tunnel writes in chunks, a message can be split anywhere
+		read('An error ocurred: 401 Una');
+		read('uthorized. Please supply the correct API key\n');
+
+		assert.deepEqual(lines, ['An error ocurred: 401 Unauthorized. Please supply the correct API key']);
+	});
+
+	it('should hand out one line at a time', function() {
+		const lines = [];
+		const read = tunnelLauncher.createLineReader(line => lines.push(line));
+
+		read('first\nsecond\nthird\n');
+
+		assert.deepEqual(lines, ['first', 'second', 'third']);
+	});
+
+	it('should keep an unfinished line until it is complete', function() {
+		const lines = [];
+		const read = tunnelLauncher.createLineReader(line => lines.push(line));
+
+		read('finished\nunfinished');
+		assert.deepEqual(lines, ['finished'], 'An unfinished line should not be handed out yet');
+
+		read(' after all\n');
+		assert.deepEqual(lines, ['finished', 'unfinished after all']);
+	});
+
+	it('should hand out the last line on flush', function() {
+		const lines = [];
+		const read = tunnelLauncher.createLineReader(line => lines.push(line));
+
+		read('no line ending here');
+		read.flush();
+		read.flush();
+
+		assert.deepEqual(lines, ['no line ending here'], 'Flushing twice should not repeat the line');
+	});
+
+	it('should handle windows line endings and buffers', function() {
+		const lines = [];
+		const read = tunnelLauncher.createLineReader(line => lines.push(line));
+
+		read(Buffer.from('first\r\nsecond\r\n'));
+
+		assert.deepEqual(lines, ['first', 'second']);
+	});
+});
