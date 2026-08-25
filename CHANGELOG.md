@@ -8,6 +8,9 @@
 - `killAsync` now resolves once the tunnel has really exited, and kills the tunnel when it does not stop in time
 - Pass numeric options such as `se-port` with their value, and no longer pass `timeout` on to the tunnel, which refused to start because of it
 - Fix the type definitions, which did not compile because of the `export =` assignment
+- Refuse redirects that would download the jar over an unencrypted connection
+- Time out downloads that stall instead of waiting forever
+- Download to a temporary file and rename it, so an interrupted download never ends up as the jar
 
 ### v1.1.17
 - Do not include the jar in the NPM package
