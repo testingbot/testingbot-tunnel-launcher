@@ -1,5 +1,9 @@
 ## Changelog
 
+### v1.1.19
+- Pass the credentials to the tunnel via the `TESTINGBOT_KEY`/`TESTINGBOT_SECRET` environment variables instead of the command line, so they no longer appear in the process list
+- Redact the key and secret from the output when `verbose` is enabled
+
 ### v1.1.17
 - Do not include the jar in the NPM package
 

@@ -125,6 +125,8 @@ You can pass the [TestingBot credentials](https://testingbot.com/members) as `ap
 
 You can also create a `~/.testingbot` file in your `$HOME` directory, with `apiKey:apiSecret` as contents.
 
+The credentials are handed to the tunnel through the `TESTINGBOT_KEY` and `TESTINGBOT_SECRET` environment variables instead of the command line, so they do not show up in the process list. They are also redacted from the output when `verbose` is enabled.
+
 
 ## Testing
 

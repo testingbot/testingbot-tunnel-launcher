@@ -266,3 +266,50 @@ describe('Tunnel Launcher (async API)', function() {
 		}
 	});
 });
+
+describe('redactCredentials', function() {
+	const options = { apiKey: 'a'.repeat(32), apiSecret: 'b'.repeat(32) };
+
+	it('should redact the key and secret from an argument list', function() {
+		const args = ['-jar', 'tunnel.jar', options.apiKey, options.apiSecret, '--tunnel-identifier', 'my-tunnel'];
+		const redacted = tunnelLauncher.redactCredentials(args, options);
+		assert.ok(!redacted.includes(options.apiKey));
+		assert.ok(!redacted.includes(options.apiSecret));
+		assert.equal(redacted.filter(arg => arg === '***').length, 2);
+		assert.ok(redacted.includes('my-tunnel'));
+	});
+
+	it('should redact the key and secret from tunnel output', function() {
+		const line = `Using ${options.apiKey}:${options.apiSecret} to connect`;
+		assert.equal(tunnelLauncher.redactCredentials(line, options), 'Using ***:*** to connect');
+	});
+
+	it('should leave output untouched when no credentials are given', function() {
+		assert.equal(tunnelLauncher.redactCredentials('hello', {}), 'hello');
+		assert.equal(tunnelLauncher.redactCredentials('hello', { apiKey: '  ' }), 'hello');
+	});
+});
+
+describe('credentials in the environment', function() {
+	const options = { apiKey: 'a'.repeat(32), apiSecret: 'b'.repeat(32) };
+
+	it('should not pass the key and secret as arguments', function() {
+		const args = tunnelLauncher.createArgs({ ...options, tunnelIdentifier: 'my-tunnel' });
+		assert.ok(!args.includes(options.apiKey), 'apiKey should not be passed as an argument');
+		assert.ok(!args.includes(options.apiSecret), 'apiSecret should not be passed as an argument');
+		assert.ok(args.includes('my-tunnel'), 'Other options should still be passed as arguments');
+	});
+
+	it('should pass the key and secret through the environment', function() {
+		const env = tunnelLauncher.createEnv(options);
+		assert.equal(env.TESTINGBOT_KEY, options.apiKey);
+		assert.equal(env.TESTINGBOT_SECRET, options.apiSecret);
+		assert.equal(env.PATH, process.env.PATH, 'The existing environment should be inherited');
+	});
+
+	it('should not set the variables when no credentials are given', function() {
+		const env = tunnelLauncher.createEnv({});
+		assert.ok(!('TESTINGBOT_KEY' in env));
+		assert.ok(!('TESTINGBOT_SECRET' in env));
+	});
+});
