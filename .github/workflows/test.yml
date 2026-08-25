@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '${{ matrix.node }}'
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
       - name: 'Cache node_modules'
         uses: actions/cache@v4
         with:
@@ -28,5 +28,7 @@ jobs:
             ${{ runner.os }}-node-v${{ matrix.node }}-
       - name: Install Dependencies
         run: npm install
+      - name: Lint
+        run: npm run lint
       - name: Run All Tests
         run: npm run test

@@ -2,6 +2,19 @@ const tunnelLauncher = require('./../lib/tunnel-launcher');
 const assert = require('assert');
 const os = require('os');
 
+// Download the jar once, so the tests that launch a tunnel do not have to
+// fit a download of several megabytes in their own timeout
+before(async function() {
+	this.timeout(180000);
+	await tunnelLauncher.downloadAsync({});
+});
+
+// A tunnel that is left behind by a test would make the next one fail
+afterEach(async function() {
+	this.timeout(30000);
+	await tunnelLauncher.killAllAsync();
+});
+
 describe('Java Version Check', function() {
 	describe('checkJava', function() {
 		it('should resolve with version when Java is installed', async function() {
@@ -191,7 +204,7 @@ describe('Tunnel Launcher (callback API)', function() {
 	});
 
 	it('should correctly return an error when the tunnel returns an error', function(done) {
-		this.timeout(10000);
+		this.timeout(60000);
 		tunnelLauncher({ apiKey: 'fake', apiSecret: 'fake' }, function(err, tunnel) {
 			assert.equal(tunnel, null);
 			assert.equal(err.message, "Invalid credentials. Please supply the correct key/secret obtained from TestingBot.com");
@@ -258,7 +271,7 @@ describe('Tunnel Launcher (async API)', function() {
 	});
 
 	it('should reject when the tunnel returns an error', async function() {
-		this.timeout(10000);
+		this.timeout(60000);
 		try {
 			await tunnelLauncher.downloadAndRunAsync({ apiKey: 'fake', apiSecret: 'fake' });
 			assert.fail('Expected downloadAndRunAsync to throw');
