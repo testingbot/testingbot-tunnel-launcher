@@ -1,5 +1,6 @@
 const tunnelLauncher = require('./../lib/tunnel-launcher');
 const assert = require('assert');
+const os = require('os');
 
 describe('Java Version Check', function() {
 	describe('checkJava', function() {
@@ -311,5 +312,49 @@ describe('credentials in the environment', function() {
 		const env = tunnelLauncher.createEnv({});
 		assert.ok(!('TESTINGBOT_KEY' in env));
 		assert.ok(!('TESTINGBOT_SECRET' in env));
+	});
+});
+
+describe('isJarValid', function() {
+	const path = require('path');
+	const fs = require('fs');
+	const jarLocation = path.join(__dirname, '..', 'testingbot-tunnel.jar');
+
+	it('should accept a working jar', async function() {
+		this.timeout(30000);
+		if (!fs.existsSync(jarLocation)) {
+			this.skip();
+		}
+		assert.equal(await tunnelLauncher.isJarValid(jarLocation), true);
+	});
+
+	it('should accept a working jar when the JVM writes to stderr', async function() {
+		this.timeout(30000);
+		if (!fs.existsSync(jarLocation)) {
+			this.skip();
+		}
+		// The JVM prints 'Picked up JAVA_TOOL_OPTIONS' to stderr, which is not a sign of a corrupt jar
+		const previous = process.env.JAVA_TOOL_OPTIONS;
+		process.env.JAVA_TOOL_OPTIONS = '-Xmx512m';
+		try {
+			assert.equal(await tunnelLauncher.isJarValid(jarLocation), true);
+		} finally {
+			if (previous === undefined) {
+				delete process.env.JAVA_TOOL_OPTIONS;
+			} else {
+				process.env.JAVA_TOOL_OPTIONS = previous;
+			}
+		}
+	});
+
+	it('should reject a corrupt jar', async function() {
+		this.timeout(30000);
+		const corruptJar = path.join(os.tmpdir(), `corrupt-${process.pid}.jar`);
+		fs.writeFileSync(corruptJar, 'this is not a jar file');
+		try {
+			assert.equal(await tunnelLauncher.isJarValid(corruptJar), false);
+		} finally {
+			fs.unlinkSync(corruptJar);
+		}
 	});
 });
