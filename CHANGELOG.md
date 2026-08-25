@@ -1,6 +1,7 @@
 ## Changelog
 
 ### v1.1.19
+- Update the development dependencies, `npm audit` reports no vulnerabilities anymore
 - Pass the credentials to the tunnel via the `TESTINGBOT_KEY`/`TESTINGBOT_SECRET` environment variables instead of the command line, so they no longer appear in the process list
 - Redact the key and secret from the output when `verbose` is enabled
 - Do not redownload the jar when the JVM writes to stderr, for example when `JAVA_TOOL_OPTIONS` is set

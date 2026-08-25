@@ -9,4 +9,4 @@
 /.claude
 /.serena
 /.editorconfig
-/.eslintrc
+/eslint.config.js

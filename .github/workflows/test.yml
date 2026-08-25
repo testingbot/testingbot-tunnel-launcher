@@ -15,12 +15,12 @@ jobs:
       matrix:
         node: [ 18, 20, 22 ]
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '${{ matrix.node }}'
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: 'Cache node_modules'
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-v${{ matrix.node }}-${{ hashFiles('**/package-lock.json') }}
