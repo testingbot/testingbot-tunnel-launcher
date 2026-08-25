@@ -148,6 +148,33 @@ declare namespace downloadAndRun {
     export function isJarValid(jarLocation: string): Promise<boolean>;
 
     /**
+     * The directory of this package, the first place the jar is kept
+     */
+    export function packageDirectory(): string;
+
+    /**
+     * The directory the jar is kept in when this package can not be written to.
+     * Can be set with the TESTINGBOT_TUNNEL_CACHE_DIR environment variable.
+     */
+    export function cacheDirectory(): string;
+
+    /**
+     * Check whether a directory can be written to
+     */
+    export function isWritableDirectory(directory: string): boolean;
+
+    /**
+     * All places a jar can be kept, in the order they are looked at
+     */
+    export function jarLocations(jarName: string): string[];
+
+    /**
+     * The place to download a jar to: the first directory that can be written to
+     * @throws {Error} If none of the locations can be written to
+     */
+    export function writableJarLocation(jarName: string, locations?: string[]): string;
+
+    /**
      * Create the path for the readyfile of a single tunnel, in a private directory
      */
     export function createReadyFilePath(): Promise<string>;

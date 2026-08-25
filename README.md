@@ -127,6 +127,12 @@ You can also create a `~/.testingbot` file in your `$HOME` directory, with `apiK
 
 The credentials are handed to the tunnel through the `TESTINGBOT_KEY` and `TESTINGBOT_SECRET` environment variables instead of the command line, so they do not show up in the process list. They are also redacted from the output when `verbose` is enabled.
 
+### Where the tunnel is stored
+
+The tunnel jar is downloaded into the directory of this package. When that directory can not be written to, which is the case for global installs and read-only images, it is stored in the cache directory of the user (`~/.cache/testingbot-tunnel-launcher` on Linux, `~/Library/Caches/testingbot-tunnel-launcher` on macOS and `%LOCALAPPDATA%` on Windows).
+
+Set `TESTINGBOT_TUNNEL_CACHE_DIR` to store the jar somewhere else.
+
 
 ## Testing
 

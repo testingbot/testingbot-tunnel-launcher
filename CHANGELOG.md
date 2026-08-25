@@ -11,6 +11,7 @@
 - Refuse redirects that would download the jar over an unencrypted connection
 - Time out downloads that stall instead of waiting forever
 - Download to a temporary file and rename it, so an interrupted download never ends up as the jar
+- Fall back to the cache directory of the user when the jar can not be stored in the package itself, which is the case for global installs and read-only images. `TESTINGBOT_TUNNEL_CACHE_DIR` overrides the location
 
 ### v1.1.17
 - Do not include the jar in the NPM package

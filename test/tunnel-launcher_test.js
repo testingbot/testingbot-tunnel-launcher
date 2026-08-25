@@ -467,3 +467,117 @@ describe('createArgs option handling', function() {
 		assert.equal(args[args.indexOf('--shared') + 1], undefined, 'A flag should not be followed by a value');
 	});
 });
+
+describe('jar location', function() {
+	const fs = require('fs');
+	const path = require('path');
+	const crypto = require('crypto');
+
+	const cacheDirVariable = process.env.TESTINGBOT_TUNNEL_CACHE_DIR;
+
+	afterEach(function() {
+		if (cacheDirVariable === undefined) {
+			delete process.env.TESTINGBOT_TUNNEL_CACHE_DIR;
+		} else {
+			process.env.TESTINGBOT_TUNNEL_CACHE_DIR = cacheDirVariable;
+		}
+	});
+
+	function tempDir(mode) {
+		const dir = path.join(os.tmpdir(), `tb_${crypto.randomBytes(6).toString('hex')}`);
+		fs.mkdirSync(dir, { recursive: true });
+		if (mode !== undefined) {
+			fs.chmodSync(dir, mode);
+		}
+		return dir;
+	}
+
+	it('should keep the jar in the package by default', function() {
+		const locations = tunnelLauncher.jarLocations('testingbot-tunnel.jar');
+		assert.equal(locations[0], path.join(tunnelLauncher.packageDirectory(), 'testingbot-tunnel.jar'));
+		assert.equal(path.dirname(locations[1]), tunnelLauncher.cacheDirectory());
+	});
+
+	it('should use the cache directory from the environment', function() {
+		process.env.TESTINGBOT_TUNNEL_CACHE_DIR = path.join(os.tmpdir(), 'tb-cache');
+		assert.equal(tunnelLauncher.cacheDirectory(), path.join(os.tmpdir(), 'tb-cache'));
+		assert.equal(tunnelLauncher.jarLocations('a.jar')[1], path.join(os.tmpdir(), 'tb-cache', 'a.jar'));
+	});
+
+	it('should point the cache directory at the home directory of the user', function() {
+		delete process.env.TESTINGBOT_TUNNEL_CACHE_DIR;
+		const cacheDir = tunnelLauncher.cacheDirectory();
+		assert.equal(path.basename(cacheDir), 'testingbot-tunnel-launcher');
+		assert.ok(path.isAbsolute(cacheDir), 'The cache directory should be an absolute path');
+	});
+
+	it('should recognize a directory that can not be written to', function() {
+		if (process.platform === 'win32' || (process.getuid && process.getuid() === 0)) {
+			this.skip();
+		}
+
+		const writable = tempDir();
+		const readOnly = tempDir(0o555);
+
+		try {
+			assert.equal(tunnelLauncher.isWritableDirectory(writable), true);
+			assert.equal(tunnelLauncher.isWritableDirectory(readOnly), false);
+			assert.equal(tunnelLauncher.isWritableDirectory(path.join(readOnly, 'nope')), false);
+		} finally {
+			fs.chmodSync(readOnly, 0o755);
+			fs.rmSync(writable, { recursive: true, force: true });
+			fs.rmSync(readOnly, { recursive: true, force: true });
+		}
+	});
+
+	it('should fall back to the next location when the first one is read only', function() {
+		if (process.platform === 'win32' || (process.getuid && process.getuid() === 0)) {
+			this.skip();
+		}
+
+		const readOnly = tempDir(0o555);
+		const writable = tempDir();
+
+		try {
+			const location = tunnelLauncher.writableJarLocation('testingbot-tunnel.jar', [
+				path.join(readOnly, 'testingbot-tunnel.jar'),
+				path.join(writable, 'testingbot-tunnel.jar')
+			]);
+			assert.equal(location, path.join(writable, 'testingbot-tunnel.jar'));
+		} finally {
+			fs.chmodSync(readOnly, 0o755);
+			fs.rmSync(readOnly, { recursive: true, force: true });
+			fs.rmSync(writable, { recursive: true, force: true });
+		}
+	});
+
+	it('should create the location it downloads to', function() {
+		const parent = tempDir();
+		const target = path.join(parent, 'nested', 'testingbot-tunnel.jar');
+
+		try {
+			assert.equal(tunnelLauncher.writableJarLocation('testingbot-tunnel.jar', [target]), target);
+			assert.ok(fs.existsSync(path.dirname(target)), 'The directory should be created');
+		} finally {
+			fs.rmSync(parent, { recursive: true, force: true });
+		}
+	});
+
+	it('should explain itself when no location can be written to', function() {
+		if (process.platform === 'win32' || (process.getuid && process.getuid() === 0)) {
+			this.skip();
+		}
+
+		const readOnly = tempDir(0o555);
+
+		try {
+			assert.throws(
+				() => tunnelLauncher.writableJarLocation('testingbot-tunnel.jar', [path.join(readOnly, 'testingbot-tunnel.jar')]),
+				/TESTINGBOT_TUNNEL_CACHE_DIR/
+			);
+		} finally {
+			fs.chmodSync(readOnly, 0o755);
+			fs.rmSync(readOnly, { recursive: true, force: true });
+		}
+	});
+});
