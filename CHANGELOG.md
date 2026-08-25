@@ -13,6 +13,7 @@
 - Download to a temporary file and rename it, so an interrupted download never ends up as the jar
 - Keep the state of every tunnel with the tunnel itself, tunnels started next to each other used to write over each other's state and `kill` left all but the last one running
 - Add `killAllAsync` and `activeTunnels` for working with more than one tunnel
+- Stop running tunnels when the process that started them exits, they used to keep running and leave their readyfile behind
 - `downloadAsync` returns the location of the jar, `startTunnelAsync` and `createArgs` accept it
 - Read the output of the tunnel line by line, messages such as `401 Unauthorized` were missed when they were split over two chunks
 - Fall back to the cache directory of the user when the jar can not be stored in the package itself, which is the case for global installs and read-only images. `TESTINGBOT_TUNNEL_CACHE_DIR` overrides the location

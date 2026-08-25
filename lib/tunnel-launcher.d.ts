@@ -206,6 +206,11 @@ declare namespace downloadAndRun {
     export function removeReadyFilePath(readyFile: string): Promise<void>;
 
     /**
+     * Stop tunnels without waiting for them, for use while the process is exiting
+     */
+    export function stopTunnelsSync(tunnels: Iterable<TunnelProcess>): void;
+
+    /**
      * Stop a process and wait until it has exited,
      * sending SIGKILL when it does not stop within the grace period
      */

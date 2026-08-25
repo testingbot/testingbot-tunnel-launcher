@@ -695,3 +695,51 @@ describe('running several tunnels', function() {
 		assert.deepEqual(tunnelLauncher.activeTunnels(), []);
 	});
 });
+
+describe('stopTunnelsSync', function() {
+	const { spawn } = require('child_process');
+	const fs = require('fs');
+	const path = require('path');
+
+	it('should stop a tunnel and clean up its readyfile', async function() {
+		const readyFile = await tunnelLauncher.createReadyFilePath();
+		const proc = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)']);
+		proc.readyFile = readyFile;
+		await new Promise(resolve => proc.once('spawn', resolve));
+
+		const exited = new Promise(resolve => proc.once('exit', (code, signal) => resolve(signal)));
+		tunnelLauncher.stopTunnelsSync([proc]);
+
+		assert.equal(await exited, 'SIGINT', 'The tunnel should have been asked to stop');
+		assert.ok(!fs.existsSync(path.dirname(readyFile)), 'The readyfile directory should be gone');
+	});
+
+	it('should not throw for a tunnel that is already gone', async function() {
+		const proc = spawn(process.execPath, ['-e', '']);
+		await new Promise(resolve => proc.once('close', resolve));
+
+		tunnelLauncher.stopTunnelsSync([proc]);
+	});
+
+	it('should stop tunnels when the process it runs in exits', async function() {
+		this.timeout(60000);
+		const jar = path.join(os.tmpdir(), `not_a_jar_${Date.now()}.jar`);
+		fs.writeFileSync(jar, 'this is not a jar file');
+
+		const before = process.listeners('exit').length;
+
+		try {
+			// The tunnel can not start, but it is registered while it runs
+			await Promise.allSettled([
+				tunnelLauncher.startTunnelAsync({ apiKey: 'k', apiSecret: 's' }, jar),
+				tunnelLauncher.startTunnelAsync({ apiKey: 'k', apiSecret: 's' }, jar)
+			]);
+
+			const added = process.listeners('exit').length - before;
+			assert.ok(added <= 1, `Expected at most one handler to be added, got ${added}`);
+			assert.ok(process.listeners('exit').length >= 1, 'A handler should be registered to stop tunnels on exit');
+		} finally {
+			fs.unlinkSync(jar);
+		}
+	});
+});
