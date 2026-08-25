@@ -358,3 +358,49 @@ describe('isJarValid', function() {
 		}
 	});
 });
+
+describe('readyfile', function() {
+	const fs = require('fs');
+	const path = require('path');
+
+	it('should give every tunnel its own readyfile', async function() {
+		const first = await tunnelLauncher.createReadyFilePath();
+		const second = await tunnelLauncher.createReadyFilePath();
+
+		try {
+			assert.notEqual(first, second, 'Two tunnels should not share a readyfile');
+			assert.notEqual(path.dirname(first), path.dirname(second), 'Two tunnels should not share a directory');
+			assert.equal(path.basename(first), 'testingbot.ready');
+			assert.ok(fs.existsSync(path.dirname(first)), 'The directory should be created upfront');
+			assert.ok(!fs.existsSync(first), 'The readyfile itself is written by the tunnel');
+		} finally {
+			await tunnelLauncher.removeReadyFilePath(first);
+			await tunnelLauncher.removeReadyFilePath(second);
+		}
+	});
+
+	it('should create the readyfile inside the temp directory', async function() {
+		const readyFile = await tunnelLauncher.createReadyFilePath();
+		try {
+			assert.ok(readyFile.startsWith(os.tmpdir()), `Expected ${readyFile} to live in ${os.tmpdir()}`);
+		} finally {
+			await tunnelLauncher.removeReadyFilePath(readyFile);
+		}
+	});
+
+	it('should remove the readyfile and its directory', async function() {
+		const readyFile = await tunnelLauncher.createReadyFilePath();
+		fs.writeFileSync(readyFile, '');
+
+		await tunnelLauncher.removeReadyFilePath(readyFile);
+
+		assert.ok(!fs.existsSync(readyFile));
+		assert.ok(!fs.existsSync(path.dirname(readyFile)));
+	});
+
+	it('should not throw when the directory is already gone', async function() {
+		const readyFile = await tunnelLauncher.createReadyFilePath();
+		await tunnelLauncher.removeReadyFilePath(readyFile);
+		await tunnelLauncher.removeReadyFilePath(readyFile);
+	});
+});
