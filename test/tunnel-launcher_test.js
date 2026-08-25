@@ -404,3 +404,38 @@ describe('readyfile', function() {
 		await tunnelLauncher.removeReadyFilePath(readyFile);
 	});
 });
+
+describe('stopProcess', function() {
+	const { spawn } = require('child_process');
+
+	it('should only resolve once the process is gone', async function() {
+		const proc = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)']);
+		await new Promise(resolve => proc.once('spawn', resolve));
+
+		await tunnelLauncher.stopProcess(proc);
+
+		assert.ok(proc.exitCode !== null || proc.signalCode !== null, 'The process should have exited');
+		assert.equal(proc.killed, true);
+	});
+
+	it('should kill a process that ignores SIGINT', async function() {
+		this.timeout(10000);
+		const script = "process.on('SIGINT', () => {}); setInterval(() => {}, 1000); console.log('ready')";
+		const proc = spawn(process.execPath, ['-e', script]);
+		// Wait for the handler to be installed, otherwise SIGINT still kills the process
+		await new Promise(resolve => proc.stdout.once('data', resolve));
+
+		const start = Date.now();
+		await tunnelLauncher.stopProcess(proc, 500);
+
+		assert.equal(proc.signalCode, 'SIGKILL', 'The process should have been killed');
+		assert.ok(Date.now() - start >= 500, 'The grace period should be respected');
+	});
+
+	it('should resolve for a process that already exited', async function() {
+		const proc = spawn(process.execPath, ['-e', '']);
+		await new Promise(resolve => proc.once('close', resolve));
+
+		await tunnelLauncher.stopProcess(proc);
+	});
+});
