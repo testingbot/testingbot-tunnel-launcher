@@ -7,7 +7,7 @@
   "types": "./lib/tunnel-launcher.d.ts",
   "homepage": "https://github.com/testingbot/testingbot-tunnel-launcher",
   "scripts": {
-    "lint": "eslint lib/",
+    "lint": "eslint .",
     "types": "tsc -p tsconfig.json",
     "test": "npm run types && mocha --exit --reporter spec"
   },

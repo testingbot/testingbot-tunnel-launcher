@@ -18,5 +18,17 @@ module.exports = [
             'prefer-const': 'error',
             'prefer-template': 'error'
         }
+    },
+    {
+        // The tests are indented with tabs and use function callbacks,
+        // mocha needs those to give a test its own timeout
+        files: ['test/**/*.js'],
+        languageOptions: {
+            globals: { ...globals.node, ...globals.mocha }
+        },
+        rules: {
+            indent: ['error', 'tab'],
+            'prefer-arrow-callback': 'off'
+        }
     }
 ]
