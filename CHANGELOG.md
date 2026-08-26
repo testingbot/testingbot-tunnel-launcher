@@ -1,6 +1,7 @@
 ## Changelog
 
 ### v1.1.20
+- Add the last lines the tunnel wrote to the error when it could not start, so an option it does not know, a local port it can not open or a jar java refuses to run says so instead of only reporting an exit code
 - Report what the tunnel says when it can not start. Only wrong credentials and an account without minutes were passed on, so the most common first failure, `You already have N tunnels active - please close another tunnel first`, reached the caller as `Could not start TestingBot Tunnel. Exit code 1`. Everything the TestingBot API refuses is passed on now, in the wording of the tunnel
 
 ### v1.1.19

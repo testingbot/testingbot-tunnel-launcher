@@ -170,6 +170,17 @@ declare namespace downloadAndRun {
     export function classifyTunnelError(line: string): string | null;
 
     /**
+     * Describe why the tunnel did not start, adding the last lines it
+     * wrote when the reason is not one we recognise
+     */
+    export function describeStartupFailure(failure: {
+        error?: string;
+        code: number | null;
+        signal: string | null;
+        output?: string[];
+    }): string;
+
+    /**
      * Check whether a cached jar file can be run
      */
     export function isJarValid(jarLocation: string): Promise<boolean>;

@@ -690,6 +690,8 @@ describe('running several tunnels', function() {
 			assert.deepEqual(results.map(result => result.status), ['rejected', 'rejected']);
 			for (const result of results) {
 				assert.ok(result.reason.message.includes('Could not start TestingBot Tunnel'), `Unexpected error: ${result.reason.message}`);
+				// What java said about the jar should reach the caller as well
+				assert.ok(/jarfile|jar file|Error/i.test(result.reason.message), `Expected the output of the tunnel in: ${result.reason.message}`);
 			}
 
 			assert.deepEqual(tunnelLauncher.activeTunnels(), [], 'No tunnel should be left behind');
@@ -793,5 +795,51 @@ describe('classifyTunnelError', function() {
 		assert.equal(tunnelLauncher.classifyTunnelError('INFO: Please wait while your personal Tunnel Server is being setup.'), null);
 		assert.equal(tunnelLauncher.classifyTunnelError('You may start your tests.'), null);
 		assert.equal(tunnelLauncher.classifyTunnelError(''), null);
+	});
+});
+
+describe('describeStartupFailure', function() {
+	it('should add what the tunnel wrote to the exit code', function() {
+		const message = tunnelLauncher.describeStartupFailure({
+			code: 1,
+			signal: null,
+			output: ['Could not set up local http proxy. Please make sure this program can open port 8087 on this computer.']
+		});
+
+		assert.ok(message.includes('Exit code 1'), message);
+		assert.ok(message.includes('can open port 8087'), 'The reason the tunnel gave should be part of the error');
+	});
+
+	it('should keep a reason we recognised', function() {
+		const message = tunnelLauncher.describeStartupFailure({
+			error: 'You already have 2 tunnels active - please close another tunnel first',
+			code: 1,
+			signal: null,
+			output: ['Shutting down your personal Tunnel Server.']
+		});
+
+		assert.equal(message, 'You already have 2 tunnels active - please close another tunnel first');
+	});
+
+	it('should report the exit code on its own when the tunnel said nothing', function() {
+		assert.equal(
+			tunnelLauncher.describeStartupFailure({ code: 143, signal: 'SIGTERM' }),
+			'Could not start TestingBot Tunnel. Exit code 143 signal: SIGTERM'
+		);
+		assert.equal(
+			tunnelLauncher.describeStartupFailure({ code: 1, signal: null, output: ['', ''] }),
+			'Could not start TestingBot Tunnel. Exit code 1 signal: null'
+		);
+	});
+
+	it('should report an option the tunnel does not know', function() {
+		// The tunnel exits with code 2 for a command line it can not parse
+		const message = tunnelLauncher.describeStartupFailure({
+			code: 2,
+			signal: null,
+			output: ['Unrecognized option: --typo']
+		});
+
+		assert.ok(message.includes('Unrecognized option: --typo'), message);
 	});
 });
