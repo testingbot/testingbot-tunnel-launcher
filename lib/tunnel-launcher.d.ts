@@ -164,6 +164,12 @@ declare namespace downloadAndRun {
     };
 
     /**
+     * Turn a line the tunnel wrote into the reason it could not start,
+     * or null when the line is not an error
+     */
+    export function classifyTunnelError(line: string): string | null;
+
+    /**
      * Check whether a cached jar file can be run
      */
     export function isJarValid(jarLocation: string): Promise<boolean>;

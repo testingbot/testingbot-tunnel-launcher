@@ -756,3 +756,42 @@ describe('stopTunnelsSync', function() {
 		}
 	});
 });
+
+describe('classifyTunnelError', function() {
+	it('should report the tunnel limit with the wording of the tunnel', function() {
+		const line = 'An error ocurred: You already have 2 tunnels active - please close another tunnel first';
+		assert.equal(tunnelLauncher.classifyTunnelError(line), 'You already have 2 tunnels active - please close another tunnel first');
+	});
+
+	it('should report anything else the api refuses', function() {
+		assert.equal(
+			tunnelLauncher.classifyTunnelError('An error ocurred: Your account has been suspended'),
+			'Your account has been suspended'
+		);
+	});
+
+	it('should keep the friendlier message for wrong credentials', function() {
+		const line = 'An error ocurred: 401 Unauthorized. Please supply the correct API key and API secret';
+		assert.equal(tunnelLauncher.classifyTunnelError(line), 'Invalid credentials. Please supply the correct key/secret obtained from TestingBot.com');
+	});
+
+	it('should keep the friendlier message for an account without minutes', function() {
+		const line = 'An error ocurred: You have no minutes left on your account';
+		assert.equal(tunnelLauncher.classifyTunnelError(line), 'You do not have any minutes left. Please upgrade your account at TestingBot.com');
+	});
+
+	it('should fall back to the whole line when there is nothing behind the prefix', function() {
+		assert.equal(tunnelLauncher.classifyTunnelError('An error ocurred:'), 'An error ocurred:');
+	});
+
+	it('should report a tunnel that can not reach testingbot', function() {
+		const line = "Creating a new tunnel failed, please make sure you're supplying correct credentials and that you can connect to the TestingBot network.";
+		assert.equal(tunnelLauncher.classifyTunnelError(line), line);
+	});
+
+	it('should leave ordinary output alone', function() {
+		assert.equal(tunnelLauncher.classifyTunnelError('INFO: Please wait while your personal Tunnel Server is being setup.'), null);
+		assert.equal(tunnelLauncher.classifyTunnelError('You may start your tests.'), null);
+		assert.equal(tunnelLauncher.classifyTunnelError(''), null);
+	});
+});

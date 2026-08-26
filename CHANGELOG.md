@@ -1,5 +1,8 @@
 ## Changelog
 
+### v1.1.20
+- Report what the tunnel says when it can not start. Only wrong credentials and an account without minutes were passed on, so the most common first failure, `You already have N tunnels active - please close another tunnel first`, reached the caller as `Could not start TestingBot Tunnel. Exit code 1`. Everything the TestingBot API refuses is passed on now, in the wording of the tunnel
+
 ### v1.1.19
 - Update the development dependencies, `npm audit` reports no vulnerabilities anymore
 - Pass the credentials to the tunnel via the `TESTINGBOT_KEY`/`TESTINGBOT_SECRET` environment variables instead of the command line, so they no longer appear in the process list
