@@ -93,7 +93,7 @@ const options = {
   logfile: null,
 
   // Change the tunnel version - see versions on https://testingbot.com/support/other/tunnel/changelog.html
-  tunnelVersion: "4.0",
+  tunnelVersion: "5.0",
 
   // Gives this tunnel a unique identifier
   tunnelIdentifier: "myIdentifier",
@@ -118,6 +118,84 @@ testingbotTunnel(options, function(err, tunnel) {
   });
 });
 ```
+
+Any other option is passed on to the tunnel as `--option value`, booleans as a flag without a value and lists pass the option once for every value.
+
+### TestingBot Tunnel 5.0
+
+[TestingBot Tunnel 5.0](https://github.com/testingbot/Testingbot-Tunnel/releases/tag/v5.0) requires **Java 17** or higher, older tunnels run on Java 11. The launcher asks the jar which version it is and checks for the Java version that version needs.
+
+5.0 adds these options. Passing them to an older tunnel fails before it is started, with a message saying which option needs 5.0.
+
+```javascript
+const tunnel = await testingbotTunnel.downloadAndRunAsync({
+  apiKey: process.env.TB_KEY,
+  apiSecret: process.env.TB_SECRET,
+  tunnelVersion: '5.0',
+
+  // The Selenium relay, local proxy and metrics now listen on 127.0.0.1 only.
+  // Use 0.0.0.0 when tests run on another machine than the tunnel.
+  bindAddress: '0.0.0.0',
+
+  // error, warn, info (default), debug or trace
+  logLevel: 'info',
+  // text (default) or json, the launcher understands both
+  logFormat: 'text',
+  // Which requests to log: none, url, headers or errors (default)
+  logHttp: 'url',
+
+  // Only allow these hosts through the tunnel, others get a 403
+  allowHosts: 'example.com,*.example.com',
+  // Do not bump SSL for these hosts
+  noBumpDomains: 'bank.example.com',
+  // Whether tests may reach localhost: allow (default) or deny
+  localhostPolicy: 'allow',
+
+  // Change request and response headers, a list passes the option for every entry
+  header: ['X-Test: 1', '-Cookie'],
+  responseHeader: '-Server',
+  requestIdHeader: 'X-Request-Id',
+
+  // Trust extra CA certificates (PEM)
+  cacertFile: ['/etc/ssl/corporate.pem'],
+  // Send connections for a host to another host
+  connectTo: 'app.example.com:443:127.0.0.1:8443',
+
+  // DNS: timeout in seconds and round robin over the servers in `dns`
+  dnsTimeout: 5,
+  dnsRoundRobin: false,
+
+  // Timeouts in seconds
+  httpDialTimeout: 15,
+  httpIdleTimeout: 120,
+
+  // Proxy for the connection to TestingBot itself, defaults to `proxy`
+  proxyTestingbot: 'http://proxy.example.com:3128',
+  proxyTestingbotUserpwd: 'user:pwd',
+  // basic (default) or negotiate, with Kerberos
+  proxyAuthScheme: 'basic',
+  proxySpn: 'HTTP/proxy.example.com',
+  krb5Principal: 'user@EXAMPLE.COM',
+  krb5Keytab: '/etc/krb5.keytab',
+  krb5Hosts: 'intranet.example.com',
+
+  // Proxy autoconfiguration for the tunnel itself
+  pacLocal: '/etc/proxy.pac',
+  pacLocalSha256: '<sha256 of the pac file>',
+
+  // Pin the SSH host key of TestingBot: warn (default) or require
+  sshHostKey: 'SHA256:...',
+  sshHostKeyPolicy: 'require',
+
+  // How websockets are proxied: connect (default) or get
+  wsProxyMode: 'connect',
+
+  // Read options from a properties file
+  config: '/etc/testingbot-tunnel.properties'
+});
+```
+
+Tunnel 5.0 also reads every option from a `TESTINGBOT_` environment variable, for example `TESTINGBOT_SE_PORT` for `se-port`. The tunnel inherits the environment of your process, so such variables apply to tunnels started with this launcher as well. Options passed to the launcher take precedence.
 
 ### Credentials
 

@@ -843,3 +843,302 @@ describe('describeStartupFailure', function() {
 		assert.ok(message.includes('Unrecognized option: --typo'), message);
 	});
 });
+
+describe('TestingBot Tunnel 5.0', function() {
+	describe('isVersion5OrUp', function() {
+		it('should recognise 5.0 and newer', function() {
+			assert.equal(tunnelLauncher.isVersion5OrUp('5.0'), true);
+			assert.equal(tunnelLauncher.isVersion5OrUp('5.1'), true);
+			assert.equal(tunnelLauncher.isVersion5OrUp('6'), true);
+			assert.equal(tunnelLauncher.isVersion5OrUp('10.0'), true);
+		});
+
+		it('should recognise older versions', function() {
+			assert.equal(tunnelLauncher.isVersion5OrUp('4.9'), false);
+			assert.equal(tunnelLauncher.isVersion5OrUp('4.0'), false);
+			assert.equal(tunnelLauncher.isVersion5OrUp('1.19'), false);
+		});
+
+		it('should not guess when the version is not known', function() {
+			assert.equal(tunnelLauncher.isVersion5OrUp(undefined), null);
+			assert.equal(tunnelLauncher.isVersion5OrUp(null), null);
+			assert.equal(tunnelLauncher.isVersion5OrUp('latest'), null);
+		});
+	});
+
+	describe('requiredJavaVersion', function() {
+		it('should require Java 17 for 5.0 and up', function() {
+			assert.equal(tunnelLauncher.requiredJavaVersion('5.0'), 17);
+			assert.equal(tunnelLauncher.requiredJavaVersion('5.2'), 17);
+		});
+
+		it('should require Java 11 for older tunnels', function() {
+			assert.equal(tunnelLauncher.requiredJavaVersion('4.9'), 11);
+		});
+
+		it('should require Java 11 when the version is not known', function() {
+			// The tunnel itself says so when it needs a newer Java
+			assert.equal(tunnelLauncher.requiredJavaVersion(null), 11);
+		});
+	});
+
+	describe('validateJavaVersion with a minimum', function() {
+		it('should reject Java 11 for tunnel 5.0', function() {
+			const result = tunnelLauncher.validateJavaVersion('openjdk version "11.0.12" 2021-07-20', 17);
+			assert.equal(result.valid, false);
+			assert.equal(result.version, 11);
+			assert.equal(result.error, 'Java 11 is installed, but Java 17 or higher is required for testingbot-tunnel.');
+		});
+
+		it('should accept Java 17 for tunnel 5.0', function() {
+			const result = tunnelLauncher.validateJavaVersion('openjdk version "17.0.1" 2021-10-19', 17);
+			assert.equal(result.valid, true);
+			assert.equal(result.version, 17);
+		});
+
+		it('should mention the minimum when the version is unknown', function() {
+			const result = tunnelLauncher.validateJavaVersion('', 17);
+			assert.ok(result.error.includes('Java 17 or higher'));
+		});
+	});
+
+	describe('createArgs', function() {
+		it('should pass the new options as the tunnel spells them', function() {
+			const args = tunnelLauncher.createArgs({
+				bindAddress: '0.0.0.0',
+				logLevel: 'debug',
+				logFormat: 'json',
+				allowHosts: 'example.com,*.example.com',
+				noBumpDomains: 'bank.example.com',
+				proxyTestingbotUserpwd: 'user:pwd',
+				pacLocalSha256: 'abc',
+				dnsTimeout: 10,
+				dnsRoundRobin: true
+			}, 'tunnel.jar');
+
+			assert.deepEqual(args, [
+				'-jar', 'tunnel.jar',
+				'--bind-address', '0.0.0.0',
+				'--log-level', 'debug',
+				'--log-format', 'json',
+				'--allow-hosts', 'example.com,*.example.com',
+				'--nobump-domains', 'bank.example.com',
+				'--proxy-testingbot-userpwd', 'user:pwd',
+				'--pac-local-sha256', 'abc',
+				'--dns-timeout', '10',
+				'--dns-round-robin'
+			]);
+		});
+
+		it('should pass an option once for every value in a list', function() {
+			const args = tunnelLauncher.createArgs({
+				header: ['X-Test: 1', '-Cookie'],
+				cacertFile: ['/a.pem', '/b.pem']
+			}, 'tunnel.jar');
+
+			assert.deepEqual(args, [
+				'-jar', 'tunnel.jar',
+				'--header', 'X-Test: 1',
+				'--header', '-Cookie',
+				'--cacert-file', '/a.pem',
+				'--cacert-file', '/b.pem'
+			]);
+		});
+
+		it('should skip empty values in a list', function() {
+			const args = tunnelLauncher.createArgs({ header: ['', 'X-Test: 1'] }, 'tunnel.jar');
+			assert.deepEqual(args, ['-jar', 'tunnel.jar', '--header', 'X-Test: 1']);
+		});
+
+		it('should still accept the options as the tunnel spells them', function() {
+			const args = tunnelLauncher.createArgs({ 'bind-address': '0.0.0.0' }, 'tunnel.jar');
+			assert.deepEqual(args, ['-jar', 'tunnel.jar', '--bind-address', '0.0.0.0']);
+		});
+	});
+
+	describe('validateOptions', function() {
+		it('should accept a list of strings', function() {
+			assert.doesNotThrow(() => tunnelLauncher.validateOptions({ header: ['X-Test: 1'] }));
+		});
+
+		it('should reject a list holding something else', function() {
+			assert.throws(() => tunnelLauncher.validateOptions({ header: [{ name: 'X-Test' }] }), {
+				message: 'header must be a list of strings'
+			});
+		});
+	});
+
+	describe('validateOptionsForVersion', function() {
+		it('should refuse 5.0 options for an older tunnel', function() {
+			assert.throws(() => tunnelLauncher.validateOptionsForVersion({ bindAddress: '0.0.0.0' }, '4.9'), {
+				message: 'bindAddress requires TestingBot Tunnel 5.0 or higher, but version 4.9 is used. Set tunnelVersion to "5.0" or higher.'
+			});
+		});
+
+		it('should refuse 5.0 options spelled the way the tunnel does', function() {
+			assert.throws(() => tunnelLauncher.validateOptionsForVersion({ 'log-level': 'debug' }, '4.9'), /log-level requires TestingBot Tunnel 5.0/);
+			assert.throws(() => tunnelLauncher.validateOptionsForVersion({ header: ['X-Test: 1'] }, '4.0'), /header requires TestingBot Tunnel 5.0/);
+		});
+
+		it('should accept 5.0 options for 5.0 and up', function() {
+			const options = { bindAddress: '0.0.0.0', logLevel: 'debug', header: ['X-Test: 1'] };
+			assert.doesNotThrow(() => tunnelLauncher.validateOptionsForVersion(options, '5.0'));
+			assert.doesNotThrow(() => tunnelLauncher.validateOptionsForVersion(options, '5.1'));
+		});
+
+		it('should accept 5.0 options when the version is not known', function() {
+			assert.doesNotThrow(() => tunnelLauncher.validateOptionsForVersion({ bindAddress: '0.0.0.0' }, null));
+		});
+
+		it('should accept options every version knows about', function() {
+			const options = { tunnelIdentifier: 'id', shared: true, 'se-port': 4445, noBump: true, apiKey: 'k', timeout: 60 };
+			assert.doesNotThrow(() => tunnelLauncher.validateOptionsForVersion(options, '4.9'));
+		});
+
+		it('should ignore 5.0 options that are switched off', function() {
+			const options = { dnsRoundRobin: false, bindAddress: undefined, logLevel: null };
+			assert.doesNotThrow(() => tunnelLauncher.validateOptionsForVersion(options, '4.9'));
+		});
+	});
+
+	describe('classifyTunnelError', function() {
+		// What tunnel 5.0 writes when the API refuses to create a tunnel
+		const failure = body => [
+			'Creating a new tunnel failed, please make sure you\'re supplying correct credentials and that you can connect to the TestingBot network.',
+			'Use --doctor to verify if everything is set up correctly.',
+			`Could not start tunnel: Failed : HTTP error code : ${body}`
+		];
+
+		// The launcher keeps the last reason it recognises
+		const reasonFor = lines => lines.map(tunnelLauncher.classifyTunnelError).filter(Boolean).pop();
+
+		it('should report wrong credentials', function() {
+			const lines = failure('401 - {"error":"401 Unauthorized. Please supply the correct API key and API secret"}');
+			assert.equal(reasonFor(lines), 'Invalid credentials. Please supply the correct key/secret obtained from TestingBot.com');
+		});
+
+		it('should report an account without minutes', function() {
+			const lines = failure('402 - {"error":"You have no minutes left"}');
+			assert.equal(reasonFor(lines), 'You do not have any minutes left. Please upgrade your account at TestingBot.com');
+		});
+
+		it('should report the reason the api gives', function() {
+			const lines = failure('403 - {"error":"You already have 2 tunnels active - please close another tunnel first"}');
+			assert.equal(reasonFor(lines), 'You already have 2 tunnels active - please close another tunnel first');
+		});
+
+		it('should pass on an answer that is not json', function() {
+			const lines = failure('503 - Service Unavailable');
+			assert.equal(reasonFor(lines), 'Service Unavailable');
+		});
+
+		it('should report the status when the api gives no reason', function() {
+			const lines = failure('500');
+			assert.equal(reasonFor(lines), 'TestingBot refused to create the tunnel, HTTP status 500');
+		});
+
+		it('should keep the first line when the tunnel can not reach TestingBot', function() {
+			const lines = failure('').slice(0, 2).concat('Could not start tunnel: Connect to api.testingbot.com:443 failed: Connection refused');
+			assert.ok(reasonFor(lines).startsWith('Creating a new tunnel failed'));
+		});
+
+		it('should report a Java that is too old', function() {
+			const line = 'TestingBot Tunnel requires Java 17 or higher, but this is Java 11.';
+			assert.equal(tunnelLauncher.classifyTunnelError(line), line);
+		});
+	});
+
+	describe('parseLogLine', function() {
+		it('should unpack a json log record', function() {
+			const line = JSON.stringify({ timestamp: '2026-10-02T12:42:20.074Z', level: 'INFO', logger: 'com.testingbot.tunnel.App', message: 'TestingBot Tunnel 5.0' });
+			assert.deepEqual(tunnelLauncher.parseLogLine(line), ['TestingBot Tunnel 5.0']);
+		});
+
+		it('should split a json log record holding several lines', function() {
+			const line = JSON.stringify({ level: 'SEVERE', message: 'Creating a new tunnel failed\nUse --doctor\nCould not start tunnel: Failed : HTTP error code : 401 - {"error":"401 Unauthorized"}' });
+			const lines = tunnelLauncher.parseLogLine(line);
+			assert.equal(lines.length, 3);
+			assert.equal(tunnelLauncher.classifyTunnelError(lines[2]), 'Invalid credentials. Please supply the correct key/secret obtained from TestingBot.com');
+		});
+
+		it('should leave text output alone', function() {
+			assert.deepEqual(tunnelLauncher.parseLogLine('INFO: Setting up Local Proxy Port 8087'), ['INFO: Setting up Local Proxy Port 8087']);
+		});
+
+		it('should leave output that only starts with a brace alone', function() {
+			assert.deepEqual(tunnelLauncher.parseLogLine('{not json'), ['{not json']);
+			assert.deepEqual(tunnelLauncher.parseLogLine('{"no":"message"}'), ['{"no":"message"}']);
+		});
+	});
+
+	describe('readJarVersion', function() {
+		const path = require('path');
+		const fs = require('fs');
+
+		it('should read the version of a jar', async function() {
+			this.timeout(30000);
+			const jarLocation = path.join(__dirname, '..', 'testingbot-tunnel.jar');
+			if (!fs.existsSync(jarLocation)) {
+				this.skip();
+			}
+			assert.match(await tunnelLauncher.readJarVersion(jarLocation), /^\d+(\.\d+)*$/);
+		});
+
+		it('should return null for a corrupt jar', async function() {
+			this.timeout(30000);
+			const corruptJar = path.join(os.tmpdir(), `corrupt-version-${process.pid}.jar`);
+			fs.writeFileSync(corruptJar, 'this is not a jar file');
+			try {
+				assert.equal(await tunnelLauncher.readJarVersion(corruptJar), null);
+			} finally {
+				fs.unlinkSync(corruptJar);
+			}
+		});
+	});
+
+	describe('running tunnel 5.0', function() {
+		let jarLocation;
+
+		// Only runs once TestingBot publishes the 5.0 jar, and on Java 17 or higher
+		before(async function() {
+			this.timeout(180000);
+			const java = await tunnelLauncher.checkJava();
+			if (java.version === null || java.version < 17) {
+				this.skip();
+			}
+			try {
+				jarLocation = await tunnelLauncher.downloadAsync({ tunnelVersion: '5.0' });
+			} catch {
+				this.skip();
+			}
+		});
+
+		it('should report the version of the jar', async function() {
+			this.timeout(30000);
+			assert.equal(await tunnelLauncher.readJarVersion(jarLocation), '5.0');
+		});
+
+		it('should reject when the credentials are wrong', async function() {
+			this.timeout(60000);
+			await assert.rejects(tunnelLauncher.downloadAndRunAsync({ tunnelVersion: '5.0', apiKey: 'fake', apiSecret: 'fake' }), {
+				message: 'Invalid credentials. Please supply the correct key/secret obtained from TestingBot.com'
+			});
+		});
+
+		it('should reject when the credentials are wrong and the log is json', async function() {
+			this.timeout(60000);
+			await assert.rejects(tunnelLauncher.downloadAndRunAsync({ tunnelVersion: '5.0', apiKey: 'fake', apiSecret: 'fake', logFormat: 'json' }), {
+				message: 'Invalid credentials. Please supply the correct key/secret obtained from TestingBot.com'
+			});
+		});
+	});
+
+	describe('running an older tunnel', function() {
+		it('should refuse 5.0 options before starting it', async function() {
+			this.timeout(60000);
+			await assert.rejects(tunnelLauncher.downloadAndRunAsync({ tunnelVersion: '4.9', apiKey: 'fake', apiSecret: 'fake', bindAddress: '0.0.0.0' }), {
+				message: 'bindAddress requires TestingBot Tunnel 5.0 or higher, but version 4.9 is used. Set tunnelVersion to "5.0" or higher.'
+			});
+		});
+	});
+});

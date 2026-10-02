@@ -1,5 +1,13 @@
 ## Changelog
 
+### v1.2.0
+- Support TestingBot Tunnel 5.0: its new options can be passed in camelCase (`bindAddress`, `logLevel`, `logFormat`, `allowHosts`, `header`, `cacertFile`, ...) and are refused with a clear message for older tunnels
+- Ask the jar which tunnel version it is when no `tunnelVersion` is given
+- Require Java 17 for tunnel 5.0 and up, older tunnels keep running on Java 11. A cached 5.0 jar is no longer downloaded again when Java is too old for it, and the message of the tunnel saying so is passed on
+- Pass options such as `header` and `cacertFile` once for every value when given a list
+- Pass on the reason the TestingBot API gives when tunnel 5.0 can not create a tunnel, such as `You already have N tunnels active`, instead of the generic "Creating a new tunnel failed"
+- Understand the output of the tunnel with `logFormat: 'json'`
+
 ### v1.1.20
 - Add the last lines the tunnel wrote to the error when it could not start, so an option it does not know, a local port it can not open or a jar java refuses to run says so instead of only reporting an exit code
 - Report what the tunnel says when it can not start. Only wrong credentials and an account without minutes were passed on, so the most common first failure, `You already have N tunnels active - please close another tunnel first`, reached the caller as `Could not start TestingBot Tunnel. Exit code 1`. Everything the TestingBot API refuses is passed on now, in the wording of the tunnel

@@ -52,11 +52,83 @@ declare namespace downloadAndRun {
         localproxy?: number;
         /** Do not start the local proxy */
         noproxy?: boolean;
+        /** Port for the metrics endpoint (default: 8003) */
+        metricsPort?: number;
+        /** Protect the metrics endpoint with basic authentication ("user:password") */
+        metricsAuth?: string;
+        /** Extra headers to add to every request, as a JSON map */
+        extraHeaders?: string;
+
+        // The options below require TestingBot Tunnel 5.0 or higher
+
+        /** Only allow these hosts through the tunnel ("HOST,*.HOST"), others get a 403. Tunnel 5.0+ */
+        allowHosts?: string;
+        /** Address the local listeners bind to: "127.0.0.1" (default) or "0.0.0.0". Tunnel 5.0+ */
+        bindAddress?: string;
+        /** Extra CA certificates (PEM) to trust. Tunnel 5.0+ */
+        cacertFile?: string | string[];
+        /** Read options from a properties file. Tunnel 5.0+ */
+        config?: string;
+        /** Send connections for a host to another host ("HOST1:PORT1:HOST2:PORT2,..."). Tunnel 5.0+ */
+        connectTo?: string;
+        /** Spread lookups over the DNS servers instead of failing over. Tunnel 5.0+ */
+        dnsRoundRobin?: boolean;
+        /** Timeout in seconds for DNS lookups (default: 5). Tunnel 5.0+ */
+        dnsTimeout?: number;
+        /**
+         * Change request headers: "name: value" sets, "name;" sets empty,
+         * "-name" removes, "-name*" removes by prefix. Tunnel 5.0+
+         */
+        header?: string | string[];
+        /** Change response headers, same rules as `header`. Tunnel 5.0+ */
+        responseHeader?: string | string[];
+        /** Timeout in seconds for opening connections. Tunnel 5.0+ */
+        httpDialTimeout?: number;
+        /** Timeout in seconds for idle connections. Tunnel 5.0+ */
+        httpIdleTimeout?: number;
+        /** Hosts to authenticate to with Kerberos ("HOST,HOST"). Tunnel 5.0+ */
+        krb5Hosts?: string;
+        /** Kerberos keytab file, requires `krb5Principal`. Tunnel 5.0+ */
+        krb5Keytab?: string;
+        /** Kerberos principal. Tunnel 5.0+ */
+        krb5Principal?: string;
+        /** Whether tests may reach localhost: "allow" (default) or "deny". Tunnel 5.0+ */
+        localhostPolicy?: string;
+        /** Format of the log output: "text" (default) or "json". Tunnel 5.0+ */
+        logFormat?: string;
+        /** Which requests to log: "none", "url", "headers" or "errors" (default), optionally per module ("proxy:url"). Tunnel 5.0+ */
+        logHttp?: string;
+        /** Log level: "error", "warn", "info" (default), "debug" or "trace". Tunnel 5.0+ */
+        logLevel?: string;
+        /** Header holding the request id (default: "X-Request-Id"). Tunnel 5.0+ */
+        requestIdHeader?: string;
+        /** Do not bump SSL for these hosts ("HOST,HOST"). Tunnel 5.0+ */
+        noBumpDomains?: string;
+        /** Proxy autoconfiguration used by the tunnel itself, a file or URL. Tunnel 5.0+ */
+        pacLocal?: string;
+        /** SHA-256 checksum of `pacLocal`, required for a plain http URL. Tunnel 5.0+ */
+        pacLocalSha256?: string;
+        /** Authentication scheme for the upstream proxy: "basic" (default) or "negotiate". Tunnel 5.0+ */
+        proxyAuthScheme?: string;
+        /** Service principal name of the upstream proxy (default: "HTTP/<proxy-host>"). Tunnel 5.0+ */
+        proxySpn?: string;
+        /** Proxy for the connection to TestingBot itself (defaults to `proxy`). Tunnel 5.0+ */
+        proxyTestingbot?: string;
+        /** Username and password for `proxyTestingbot` ("user:pwd"). Tunnel 5.0+ */
+        proxyTestingbotUserpwd?: string;
+        /** Expected SSH host key(s) of the TestingBot server ("SHA256:..."). Tunnel 5.0+ */
+        sshHostKey?: string | string[];
+        /** What to do when the SSH host key is not the expected one: "warn" (default) or "require". Tunnel 5.0+ */
+        sshHostKeyPolicy?: string;
+        /** How websockets are proxied: "connect" (default) or "get". Tunnel 5.0+ */
+        wsProxyMode?: string;
+
         /**
          * Any other option is passed on to the tunnel as `--option value`.
-         * Booleans are passed as a flag without a value.
+         * Booleans are passed as a flag without a value,
+         * lists pass the option once for every value.
          */
-        [option: string]: string | number | boolean | undefined;
+        [option: string]: string | string[] | number | boolean | undefined;
     }
 
     export interface TunnelProcess extends ChildProcess {
@@ -117,8 +189,9 @@ declare namespace downloadAndRun {
 
     /**
      * Check if Java is installed and meets minimum version requirement
+     * (default: 11, TestingBot Tunnel 5.0 and up need 17)
      */
-    export function checkJava(): Promise<JavaVersionResult>;
+    export function checkJava(minVersion?: number): Promise<JavaVersionResult>;
 
     /**
      * Parse Java version from version output string
@@ -126,15 +199,42 @@ declare namespace downloadAndRun {
     export function parseJavaVersion(versionOutput: string): number | null;
 
     /**
-     * Validate Java version meets minimum requirement
+     * Validate Java version meets minimum requirement (default: 11)
      */
-    export function validateJavaVersion(versionOutput: string): JavaValidationResult;
+    export function validateJavaVersion(versionOutput: string, minVersion?: number): JavaValidationResult;
 
     /**
      * Validate options object
      * @throws {Error} If options are invalid
      */
     export function validateOptions(options: TunnelOptions): void;
+
+    /**
+     * Refuse options the given tunnel version does not know about.
+     * Nothing is refused when the version is not known.
+     * @throws {Error} If an option needs a newer tunnel
+     */
+    export function validateOptionsForVersion(options: TunnelOptions, tunnelVersion: string | null | undefined): void;
+
+    /**
+     * Whether a tunnel version is 5.0 or newer, null when it is not known
+     */
+    export function isVersion5OrUp(tunnelVersion: string | null | undefined): boolean | null;
+
+    /**
+     * The Java version a tunnel version needs
+     */
+    export function requiredJavaVersion(tunnelVersion: string | null | undefined): number;
+
+    /**
+     * Ask a jar which version of the tunnel it is, null when that could not be determined
+     */
+    export function readJarVersion(jarLocation: string): Promise<string | null>;
+
+    /**
+     * The lines of a message the tunnel wrote, unpacking JSON log records
+     */
+    export function parseLogLine(line: string): string[];
 
     /**
      * Create command line arguments from options.
