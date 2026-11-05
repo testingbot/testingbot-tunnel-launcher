@@ -181,6 +181,22 @@ describe('Downloader', function() {
 		});
 	});
 
+	it('should not save a redirect without a location as the file', function(done) {
+		handlers['/redirect-nowhere'] = (req, res) => {
+			res.writeHead(302);
+			res.end('<html>moved</html>');
+		};
+
+		const destinationPath = destination();
+		downloader.get(`${baseUrl}/redirect-nowhere`, { destination: destinationPath }, function(err, downloadedFilePath) {
+			assert.notEqual(err, null);
+			assert.ok(err.message.includes('statusCode: 302'), `Expected the status code, got: ${err.message}`);
+			assert.equal(downloadedFilePath, null);
+			assert.ok(!fs.existsSync(destinationPath));
+			done();
+		});
+	});
+
 	it('should time out instead of hanging on a stalled download', function(done) {
 		this.timeout(10000);
 		handlers['/stalled'] = (req, res) => {
