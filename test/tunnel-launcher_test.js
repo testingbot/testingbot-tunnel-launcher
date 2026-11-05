@@ -418,6 +418,39 @@ describe('readyfile', function() {
 	});
 });
 
+describe('a tunnel that does not start in time', function() {
+	const fakeJava = require('./helpers/fake-java');
+	let java;
+
+	before(function() {
+		if (process.platform === 'win32') {
+			this.skip();
+		}
+	});
+
+	beforeEach(function() {
+		java = fakeJava.install();
+	});
+
+	afterEach(function() {
+		java.restore();
+	});
+
+	it('should be stopped once the timeout passes', async function() {
+		this.timeout(15000);
+
+		await assert.rejects(tunnelLauncher.startTunnelAsync({ timeout: 1 }, 'tunnel.jar'), {
+			message: 'Tunnel failed to launch in 1 seconds.'
+		});
+
+		// Stopping is asynchronous, give the process a moment to go
+		for (let i = 0; i < 50 && tunnelLauncher.activeTunnels().length > 0; i++) {
+			await new Promise(resolve => setTimeout(resolve, 100));
+		}
+		assert.equal(tunnelLauncher.activeTunnels().length, 0, 'The tunnel should be stopped');
+	});
+});
+
 describe('stopProcess', function() {
 	const { spawn } = require('child_process');
 
