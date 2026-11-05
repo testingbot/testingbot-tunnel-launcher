@@ -831,6 +831,38 @@ describe('classifyTunnelError', function() {
 	});
 });
 
+describe('a tunnel that is ready', function() {
+	const fakeJava = require('./helpers/fake-java');
+	let java;
+
+	before(function() {
+		if (process.platform === 'win32') {
+			this.skip();
+		}
+	});
+
+	beforeEach(function() {
+		java = fakeJava.install();
+	});
+
+	afterEach(function() {
+		java.restore();
+	});
+
+	it('should keep running when it reports a failed API call', async function() {
+		this.timeout(15000);
+		process.env.FAKE_JAVA = 'ready';
+
+		const tunnel = await tunnelLauncher.startTunnelAsync({}, 'tunnel.jar');
+		// The fake tunnel reports "HTTP error code : 503" 2 seconds after it is ready
+		await new Promise(resolve => setTimeout(resolve, 3000));
+
+		assert.equal(tunnel.exitCode, null, 'The tunnel should still be running');
+		assert.equal(tunnel.signalCode, null, 'The tunnel should still be running');
+		assert.equal(tunnel.error, undefined);
+	});
+});
+
 describe('describeStartupFailure', function() {
 	it('should add what the tunnel wrote to the exit code', function() {
 		const message = tunnelLauncher.describeStartupFailure({
