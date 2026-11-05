@@ -123,6 +123,11 @@ declare namespace downloadAndRun {
         /** How websockets are proxied: "connect" (default) or "get". Tunnel 5.0+ */
         wsProxyMode?: string;
 
+        /** How many SSH connections to open to the tunnel server, 1-8 (default: 4). Tunnel 5.1+ */
+        sshConnections?: number;
+        /** Serve this local directory through a local webserver */
+        web?: string;
+
         /**
          * Any other option is passed on to the tunnel as `--option value`.
          * Booleans are passed as a flag without a value,
@@ -215,6 +220,18 @@ declare namespace downloadAndRun {
      * @throws {Error} If an option needs a newer tunnel
      */
     export function validateOptionsForVersion(options: TunnelOptions, tunnelVersion: string | null | undefined): void;
+
+    /**
+     * Compare two tunnel versions, below 0 when `a` is older, above 0 when newer,
+     * null when either is not a version
+     */
+    export function compareVersions(a: string | null | undefined, b: string | null | undefined): number | null;
+
+    /**
+     * The first tunnel version that knows about an option (as spelled on its command line),
+     * null when every version does
+     */
+    export function minimumTunnelVersion(optionName: string): string | null;
 
     /**
      * Whether a tunnel version is 5.0 or newer, null when it is not known

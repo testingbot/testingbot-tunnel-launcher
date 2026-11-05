@@ -1096,6 +1096,48 @@ describe('TestingBot Tunnel 5.0', function() {
 		});
 	});
 
+	describe('validateOptionsForVersion with 5.1 options', function() {
+		it('should refuse sshConnections for 5.0 and older', function() {
+			assert.throws(() => tunnelLauncher.validateOptionsForVersion({ sshConnections: 4 }, '5.0'), {
+				message: 'sshConnections requires TestingBot Tunnel 5.1 or higher, but version 5.0 is used. Set tunnelVersion to "5.1" or higher.'
+			});
+			assert.throws(() => tunnelLauncher.validateOptionsForVersion({ 'ssh-connections': 4 }, '4.9'), /ssh-connections requires TestingBot Tunnel 5.1/);
+		});
+
+		it('should accept sshConnections for 5.1 and up', function() {
+			assert.doesNotThrow(() => tunnelLauncher.validateOptionsForVersion({ sshConnections: 4 }, '5.1'));
+			assert.doesNotThrow(() => tunnelLauncher.validateOptionsForVersion({ sshConnections: 4 }, '5.10'));
+			assert.doesNotThrow(() => tunnelLauncher.validateOptionsForVersion({ sshConnections: 4 }, '6.0'));
+			assert.doesNotThrow(() => tunnelLauncher.validateOptionsForVersion({ sshConnections: 4 }, null));
+		});
+
+		it('should pass sshConnections to the tunnel', function() {
+			assert.deepEqual(tunnelLauncher.createArgs({ sshConnections: 2 }, 'tunnel.jar'), ['-jar', 'tunnel.jar', '--ssh-connections', '2']);
+		});
+
+		it('should only accept 1 to 8 connections', function() {
+			assert.doesNotThrow(() => tunnelLauncher.validateOptions({ sshConnections: 1 }));
+			assert.doesNotThrow(() => tunnelLauncher.validateOptions({ sshConnections: 8 }));
+			for (const value of [0, 9, 2.5, '4']) {
+				assert.throws(() => tunnelLauncher.validateOptions({ sshConnections: value }), { message: 'sshConnections must be a whole number from 1 to 8' });
+			}
+		});
+	});
+
+	describe('compareVersions', function() {
+		it('should compare versions part by part', function() {
+			assert.ok(tunnelLauncher.compareVersions('5.0', '5.1') < 0);
+			assert.ok(tunnelLauncher.compareVersions('5.10', '5.9') > 0);
+			assert.equal(tunnelLauncher.compareVersions('5', '5.0'), 0);
+			assert.ok(tunnelLauncher.compareVersions('4.9', '5.0') < 0);
+		});
+
+		it('should return null for something that is not a version', function() {
+			assert.equal(tunnelLauncher.compareVersions('latest', '5.0'), null);
+			assert.equal(tunnelLauncher.compareVersions(null, '5.0'), null);
+		});
+	});
+
 	describe('running tunnel 5.0', function() {
 		let jarLocation;
 
