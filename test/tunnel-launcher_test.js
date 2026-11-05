@@ -453,6 +453,31 @@ describe('stopProcess', function() {
 	});
 });
 
+describe('a tunnel that can not be started', function() {
+	const fs = require('fs');
+	const path = require('path');
+
+	let originalPath;
+	let emptyDirectory;
+
+	beforeEach(function() {
+		originalPath = process.env.PATH;
+		emptyDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'no-java-'));
+	});
+
+	afterEach(function() {
+		process.env.PATH = originalPath;
+		fs.rmSync(emptyDirectory, { recursive: true, force: true });
+	});
+
+	it('should reject instead of crashing when java is not found', async function() {
+		process.env.PATH = emptyDirectory;
+
+		await assert.rejects(tunnelLauncher.startTunnelAsync({}, 'tunnel.jar'), /Could not start TestingBot Tunnel: .*ENOENT/);
+		assert.equal(tunnelLauncher.activeTunnels().length, 0, 'The tunnel should not be remembered');
+	});
+});
+
 describe('createArgs option handling', function() {
 	it('should pass numeric options with their value', function() {
 		const args = tunnelLauncher.createArgs({ apiKey: 'k', apiSecret: 's', 'se-port': 4445 });
