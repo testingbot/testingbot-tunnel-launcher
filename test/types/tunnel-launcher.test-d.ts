@@ -28,6 +28,12 @@ const options5: tunnelLauncher.TunnelOptions = {
     'allow-hosts': 'example.com,*.example.com'
 };
 
+// Options of TestingBot Tunnel 5.1 and up
+const options51: tunnelLauncher.TunnelOptions = { tunnelVersion: '5.1', sshConnections: 4, web: './public' };
+const compared: number | null = tunnelLauncher.compareVersions('5.0', '5.1');
+const minimum: string | null = tunnelLauncher.minimumTunnelVersion('ssh-connections');
+void [options51, compared, minimum];
+
 // Values read from the environment are plain strings
 const fromEnvironment: string = process.env.BIND_ADDRESS || '127.0.0.1';
 const options5FromEnvironment: tunnelLauncher.TunnelOptions = { bindAddress: fromEnvironment, logLevel: fromEnvironment };

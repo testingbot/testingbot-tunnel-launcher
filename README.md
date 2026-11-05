@@ -195,6 +195,17 @@ const tunnel = await testingbotTunnel.downloadAndRunAsync({
 });
 ```
 
+Tunnel 5.1 adds `sshConnections`: how many SSH connections to open to the tunnel server, from 1 to 8 (default 4). Passing it to an older tunnel fails before it is started.
+
+```javascript
+const tunnel = await testingbotTunnel.downloadAndRunAsync({
+  apiKey: process.env.TB_KEY,
+  apiSecret: process.env.TB_SECRET,
+  tunnelVersion: '5.1',
+  sshConnections: 4
+});
+```
+
 Tunnel 5.0 also reads every option from a `TESTINGBOT_` environment variable, for example `TESTINGBOT_SE_PORT` for `se-port`. The tunnel inherits the environment of your process, so such variables apply to tunnels started with this launcher as well. Options passed to the launcher take precedence.
 
 ### Credentials
