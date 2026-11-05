@@ -251,6 +251,39 @@ await testingbotTunnel.killAllAsync();
 
 `killAsync` closes the tunnel that was started last, `killAllAsync` closes all of them and `activeTunnels()` returns the ones that are still running.
 
+### Checking the configuration
+
+`doctor` lets the tunnel check whether it can work with the options you give it, without starting a tunnel: whether TestingBot can be reached, the local ports can be opened, the upstream proxy accepts the credentials, and so on. It takes the same options as `downloadAndRunAsync`.
+
+```javascript
+const report = await testingbotTunnel.doctor({
+  apiKey: process.env.TB_KEY,
+  apiSecret: process.env.TB_SECRET,
+  proxy: 'proxy.example.com:3128'
+});
+
+for (const check of report.checks) {
+  // status is ok, warn, fail or info
+  console.log(check.status, check.message);
+}
+
+if (!report.ok) {
+  process.exit(1);
+}
+```
+
+`pacTest` asks TestingBot Tunnel 5.0 and up which way it would send a URL with a PAC file (`pacLocal`), without starting a tunnel:
+
+```javascript
+const result = await testingbotTunnel.pacTest({ pacLocal: '/etc/proxy.pac' }, 'https://intranet.example.com/');
+
+console.log(result.result); // PROXY proxy.example.com:3128; DIRECT
+console.log(result.egress); // via proxy.example.com:3128
+console.log(result.direct); // false
+```
+
+It rejects with the reason when the PAC file can not be used, for example when it can not be parsed or does not match `pacLocalSha256`.
+
 ### Where the tunnel is stored
 
 The tunnel jar is downloaded into the directory of this package. When that directory can not be written to, which is the case for global installs and read-only images, it is stored in the cache directory of the user (`~/.cache/testingbot-tunnel-launcher` on Linux, `~/Library/Caches/testingbot-tunnel-launcher` on macOS and `%LOCALAPPDATA%` on Windows).

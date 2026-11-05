@@ -171,6 +171,33 @@ declare namespace downloadAndRun {
         error: string | null;
     }
 
+    export interface DoctorCheck {
+        /** "ok" passed, "warn" needs attention, "fail" will stop the tunnel from working, "info" is a note */
+        status: 'ok' | 'warn' | 'fail' | 'info';
+        message: string;
+    }
+
+    export interface DoctorReport {
+        /** Whether every check passed */
+        ok: boolean;
+        checks: DoctorCheck[];
+        /** Everything the tunnel wrote, with the credentials redacted */
+        output: string[];
+    }
+
+    export interface PacTestResult {
+        /** The PAC file or URL that was evaluated */
+        pacFile: string;
+        url: string;
+        host: string;
+        /** What FindProxyForURL returned, e.g. "PROXY proxy:3128; DIRECT" */
+        result: string;
+        /** The way the tunnel would go, e.g. "via proxy:3128" or "direct connection" */
+        egress: string;
+        /** Whether the tunnel would connect directly */
+        direct: boolean;
+    }
+
     /**
      * Kill the active tunnel (callback version)
      */
@@ -180,6 +207,34 @@ declare namespace downloadAndRun {
      * Download and launch the TestingBot Tunnel (async version)
      */
     export function downloadAndRunAsync(options?: TunnelOptions): Promise<TunnelProcess>;
+
+    /**
+     * Let the tunnel check its configuration and connection (--doctor) without starting it.
+     * Takes the same options as downloadAndRunAsync. Resolves with the checks, also when
+     * some fail, and rejects when they could not be run.
+     */
+    export function doctor(options?: TunnelOptions): Promise<DoctorReport>;
+
+    /**
+     * Ask the tunnel which way it would send a URL with the PAC file in `pacLocal` (--pac-test),
+     * without starting it. Requires TestingBot Tunnel 5.0 or higher.
+     */
+    export function pacTest(options: TunnelOptions, url: string): Promise<PacTestResult>;
+
+    /**
+     * The messages the tunnel logged, in the text or json log format
+     */
+    export function parseLogRecords(lines: string[]): Array<{ level: string; message: string }>;
+
+    /**
+     * Turn what the tunnel logged during --doctor into a list of checks
+     */
+    export function parseDoctorOutput(lines: string[]): DoctorCheck[];
+
+    /**
+     * Read what the tunnel printed for --pac-test, null when it printed no result
+     */
+    export function parsePacTestOutput(lines: string[]): PacTestResult | null;
 
     /**
      * Kill the tunnel that was started last (async version).

@@ -38,6 +38,17 @@ void [options51, compared, minimum];
 const fromEnvironment: string = process.env.BIND_ADDRESS || '127.0.0.1';
 const options5FromEnvironment: tunnelLauncher.TunnelOptions = { bindAddress: fromEnvironment, logLevel: fromEnvironment };
 
+// Checking the configuration without starting a tunnel
+async function checks(): Promise<void> {
+    const report: tunnelLauncher.DoctorReport = await tunnelLauncher.doctor({ ...options, proxy: 'proxy:3128' });
+    const failed: tunnelLauncher.DoctorCheck[] = report.checks.filter(check => check.status === 'fail');
+    const pac: tunnelLauncher.PacTestResult = await tunnelLauncher.pacTest({ pacLocal: '/etc/proxy.pac' }, 'https://example.com/');
+    const parsed: tunnelLauncher.DoctorCheck[] = tunnelLauncher.parseDoctorOutput(report.output);
+    const pacParsed: tunnelLauncher.PacTestResult | null = tunnelLauncher.parsePacTestOutput([]);
+    void [failed, pac.direct, parsed, pacParsed, tunnelLauncher.parseLogRecords([])];
+}
+void checks;
+
 tunnelLauncher(options, (err, tunnel) => {
     if (err) {
         throw err;
