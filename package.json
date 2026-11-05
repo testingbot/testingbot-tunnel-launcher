@@ -20,7 +20,7 @@
     "typescript": "^5.9.3"
   },
   "overrides": {
-    "serialize-javascript": "^7.1.0",
+    "serialize-javascript": "^7.1.4",
     "diff": "^8.0.4"
   },
   "engines": {
