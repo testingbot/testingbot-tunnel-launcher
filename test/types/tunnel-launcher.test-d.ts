@@ -90,3 +90,14 @@ async function useAsyncApi(): Promise<void> {
 }
 
 void useAsyncApi;
+
+// Running the tunnel with the Java it includes
+const bundledOptions: tunnelLauncher.TunnelOptions = { javaRuntime: 'bundled', tunnelVersion: '5.1' };
+async function bundled(): Promise<void> {
+    const bundle: tunnelLauncher.BundledTunnel = await tunnelLauncher.downloadBundledAsync(bundledOptions);
+    const tunnel: tunnelLauncher.TunnelProcess = await tunnelLauncher.startTunnelAsync(bundledOptions, bundle.jar, bundle.java);
+    const platformName: string | null = tunnelLauncher.bundledPlatform('linux', 'x64');
+    const checksum: string | null = tunnelLauncher.parseChecksum('');
+    void [tunnel, platformName, checksum, tunnelLauncher.bundledArchiveName('linux-x64')];
+}
+void bundled;

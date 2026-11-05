@@ -32,3 +32,6 @@ jobs:
         run: npm run lint
       - name: Run All Tests
         run: npm run test
+        env:
+          # Downloads the tunnel with Java included (about 30 MB), once is enough
+          TESTINGBOT_TEST_BUNDLED: ${{ matrix.node == 22 && '1' || '' }}

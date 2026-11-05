@@ -32,6 +32,13 @@ declare namespace downloadAndRun {
         shared?: boolean;
         /** Timeout in seconds for tunnel to start (default: 90) */
         timeout?: number;
+        /**
+         * The Java to run the tunnel with (default: "auto").
+         * "system" uses the java on the PATH, "bundled" the TestingBot Tunnel download
+         * with Java included (5.0 and up), "auto" the java on the PATH when it is recent
+         * enough for the tunnel and the download with Java included otherwise.
+         */
+        javaRuntime?: 'auto' | 'system' | 'bundled';
         /** Disable SSL bumping/rewriting */
         noBump?: boolean;
         /** Disable caching */
@@ -143,6 +150,17 @@ declare namespace downloadAndRun {
         error?: string;
     }
 
+    export interface BundledTunnel {
+        /** The version of the tunnel, e.g. "5.1" */
+        version: string;
+        /** The directory it is unpacked in */
+        directory: string;
+        /** The java it includes */
+        java: string;
+        /** The tunnel jar */
+        jar: string;
+    }
+
     export interface JavaVersionResult {
         version: number | null;
     }
@@ -190,7 +208,30 @@ declare namespace downloadAndRun {
      * Start the tunnel process (requires JAR to be downloaded first).
      * Defaults to the jar that was downloaded last.
      */
-    export function startTunnelAsync(options?: TunnelOptions, jarLocation?: string): Promise<TunnelProcess>;
+    export function startTunnelAsync(options?: TunnelOptions, jarLocation?: string, javaPath?: string): Promise<TunnelProcess>;
+
+    /**
+     * Download and unpack the TestingBot Tunnel download with Java included (5.0 and up),
+     * checked against its published checksum. Downloads the latest version unless
+     * `tunnelVersion` is given.
+     */
+    export function downloadBundledAsync(options?: TunnelOptions): Promise<BundledTunnel>;
+
+    /**
+     * The name TestingBot gives a platform in its downloads with Java included,
+     * null when there is no such download for it
+     */
+    export function bundledPlatform(platform?: string, arch?: string): string | null;
+
+    /**
+     * The file name of the download with Java included for a platform
+     */
+    export function bundledArchiveName(platformName: string): string;
+
+    /**
+     * Read the checksum from a .sha256 file, null when there is none
+     */
+    export function parseChecksum(contents: string): string | null;
 
     /**
      * Check if Java is installed and meets minimum version requirement

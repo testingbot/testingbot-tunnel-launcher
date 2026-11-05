@@ -208,6 +208,27 @@ const tunnel = await testingbotTunnel.downloadAndRunAsync({
 
 Tunnel 5.0 also reads every option from a `TESTINGBOT_` environment variable, for example `TESTINGBOT_SE_PORT` for `se-port`. The tunnel inherits the environment of your process, so such variables apply to tunnels started with this launcher as well. Options passed to the launcher take precedence.
 
+### Java
+
+The tunnel is a Java program. TestingBot Tunnel 5.0 and up need Java 17 or higher, older tunnels Java 11.
+
+TestingBot also publishes the tunnel with Java included, for Linux and macOS (x64 and arm64) and Windows (x64), so nothing needs to be installed. When Java is not installed, or the installed Java is too old for the tunnel, the launcher downloads that instead (about 30 MB, once per version) and runs the tunnel with the Java it includes. The download is checked against the checksum TestingBot publishes next to it.
+
+Choose how the Java is found with `javaRuntime`:
+
+```javascript
+const tunnel = await testingbotTunnel.downloadAndRunAsync({
+  apiKey: process.env.TB_KEY,
+  apiSecret: process.env.TB_SECRET,
+  // auto (default): the installed Java when it is recent enough, the download with Java included otherwise
+  // system: always the installed Java
+  // bundled: always the download with Java included
+  javaRuntime: 'bundled'
+});
+```
+
+The download with Java included is stored in the cache directory (see below), in `bundles`. Set `TESTINGBOT_TUNNEL_RELEASES_URL` to download it from a mirror of the [TestingBot Tunnel releases](https://github.com/testingbot/Testingbot-Tunnel/releases) instead, laid out the same way (`latest` redirecting to `tag/v<version>`, files in `download/v<version>/`).
+
 ### Credentials
 
 You can pass the [TestingBot credentials](https://testingbot.com/members) as `apiKey` and `apiSecret` in the options.
